@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Daily Bible Verse
+Comment=A bible Verse Viewer
+Type=Service
+ServiceTypes=Plasma/Applet
+ 
+X-KDE-Library=plasma_applet_bibleverse
+X-KDE-PluginInfo-Author=Paul Walger
+X-KDE-PluginInfo-Email=paul@walger.name
+X-KDE-PluginInfo-Name=plasma_applet_bibleverse
+X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-Website=http://plasma.kde.org/
+X-KDE-PluginInfo-Category=Test
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true 
