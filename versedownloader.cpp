@@ -43,7 +43,7 @@ void verseDownloader::downloadNew( void )
 		case 1:
 			w = new web( this );
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseSourceSite( QString, QString ) ) );
-			w->get(QString("http://www.biblegateway.com/"));
+			w->get(QString("http://www.biblegateway.com/votd/get/?format=html"));
 			break;
 	}
 }
@@ -81,17 +81,11 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			}
 			break;
 		case 1:
-			searchstring = "<p>",
-			pos1 = bout.indexOf(searchstring,0);
-			pos2 = bout.indexOf("- <a href=",pos1);
-			text = bout.remove(pos2,out.size());
-			text = text.remove(0,pos1+searchstring.size());
-			
-			searchstring = "search=",
-			pos1 = bout2.indexOf(searchstring,0);
-			pos2 = bout2.indexOf("\"",pos1);
-			pos = bout2.remove(pos2,out.size());
-			pos = pos.remove(0,pos1+searchstring.size());
+			QString a = bout.remove(bout.indexOf("</a>)",0),bout.size());
+			a = a.remove("<div>");
+			pos = a;
+			text = a.remove(a.indexOf("(<a",0),a.size());
+			pos = pos.remove(0,pos.indexOf("\">",0)+2);
 			qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
 			if(config.translationSource != 0)
 			{
@@ -99,7 +93,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			}
 			else
 			{
-				emit newVerse(text,pos);
+				emit newVerse(text,"<a href=\"http://www.biblegateway.com\">"+pos+"</a>");
 			}
 			break;
 	}
@@ -116,10 +110,17 @@ void verseDownloader::translate( QString text,QString pos )
 		case 1://biblegateway.com
 			w = new web( this );
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseTranslationsSite( QString, QString ) ) );
+			if(config.verseSource = 1)
+			{
+					url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
+			}
+			else
+			{
+				p = convertPosition2Uni(pos,config.verseSource);//christnotes.org
+				newPos = convertUni2Position(p,config.translationSource);
+				url = "http://www.biblegateway.com/passage/?search="+newPos+";&version="+config.translationCode+";&interface=print";
+			}
 			
-			p = convertPosition2Uni(pos,config.verseSource);//christnotes.org
-			newPos = convertUni2Position(p,config.translationSource);
-			url = "http://www.biblegateway.com/passage/?search="+newPos+";&version="+config.translationCode+";&interface=print";
 			w->get(url);
 			break;
 	}
@@ -138,39 +139,52 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 	switch (config.translationSource)
 	{
 		case 1://biblegateway.com
-			searchstring = "<div class=\"result-text-style-normal\">",
-			pos1 = bout.indexOf(searchstring,0);
-			pos2 = bout.indexOf("</p>",pos1);
-			text = bout.remove(pos2,out.size());
-			text = text.remove(0,pos1+searchstring.size());
-			if(pos1 == -1 || pos2 == -1)
+			if(config.verseSource = 1)
 			{
-				qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
-				return;
+				QString a = bout.remove(bout.indexOf("</a>)",0),bout.size());
+				a = a.remove("<div>");
+				pos = a;
+				text = a.remove(a.indexOf("(<a",0),a.size());
+				pos = pos.remove(0,pos.indexOf("\">",0)+2);
+				emit newVerse(text,pos);
 			}
-			qDebug() << "pos1:" << pos1<< "pos2"<<pos2;
-			searchstring = "</sup>";
-			pos1 = text.indexOf(searchstring,0);
-			text = text.remove(0,pos1+searchstring.size());
-			doc.setHtml(text);
-			text = doc.toPlainText();//remove all Html-Tags
-			
-			searchstring = "</div>\n<h3>";
-			pos1 = bout2.indexOf(searchstring,0);
-			pos2 = bout2.indexOf("</h3>",pos1);
-			
-			if(pos1 == -1 || pos2 == -1)
+			else
 			{
-				qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
-				return;
-			}
-			pos = bout2.remove(pos2,out.size());
-			pos = pos.remove(0,pos1+searchstring.size());
-			doc.setHtml(pos);
 			
-			pos = doc.toPlainText();
-			qDebug() << "verseDownloader::pharseTranslationsSite() verse:"<< text;
-			emit newVerse(text,pos);
+				searchstring = "<div class=\"result-text-style-normal\">",
+				pos1 = bout.indexOf(searchstring,0);
+				pos2 = bout.indexOf("</p>",pos1);
+				text = bout.remove(pos2,out.size());
+				text = text.remove(0,pos1+searchstring.size());
+				if(pos1 == -1 || pos2 == -1)
+				{
+					qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
+					return;
+				}
+				qDebug() << "pos1:" << pos1<< "pos2"<<pos2;
+				searchstring = "</sup>";
+				pos1 = text.indexOf(searchstring,0);
+				text = text.remove(0,pos1+searchstring.size());
+				doc.setHtml(text);
+				text = doc.toPlainText();//remove all Html-Tags
+				
+				searchstring = "</div>\n<h3>";
+				pos1 = bout2.indexOf(searchstring,0);
+				pos2 = bout2.indexOf("</h3>",pos1);
+				
+				if(pos1 == -1 || pos2 == -1)
+				{
+					qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
+					return;
+				}
+				pos = bout2.remove(pos2,out.size());
+				pos = pos.remove(0,pos1+searchstring.size());
+				doc.setHtml(pos);
+				
+				pos = "<a href=\"http://www.biblegateway.com\">"+doc.toPlainText()+"</a>";
+				qDebug() << "verseDownloader::pharseTranslationsSite() verse:"<< text;
+				emit newVerse(text,pos);
+			}
 			break;
 		default:
 			break;
