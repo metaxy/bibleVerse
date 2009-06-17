@@ -1,0 +1,22 @@
+=========================================
+bileVerse Plasmoid 0.1
+=========================================
+This a Plamsmoid  for a everyday new Verse from the bible.
+
+Installation
+============
+
+First, you need a complete build environment. You must install packages cmake, make, gcc, g++, gettext and
+KDE development packages. These packages are called differently, depending on your distribution:
+kde-devel on Ubuntu, task-kde4-devel on Mandriva, or similar.
+
+cmake -DCMAKE_INSTALL_PREFIX=`kde4-config --prefix` 
+make
+make install
+kbuildsycoca4
+
+It was tested with KDE 4.2.91 and Qt 4.5.1
+
+If you upgraded from a previous version, don't forget to restart plasma:
+Run the following command from the console: "kquitapp plasma-desktop && sleep 3 && plasma-desktop && exit"
+Please note: You might have to re-install bibleVerse after KDE or Qt upggrades, otherwise you might experience plasma crashes.
