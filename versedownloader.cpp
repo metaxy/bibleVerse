@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "./versedownloader.h"
+#include "versedownloader.h"
 #include "web.h"
 #include <QtDebug>
 #include <QTextDocument>
@@ -93,7 +93,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			}
 			else
 			{
-				emit newVerse(text,"<a href=\"http://www.biblegateway.com\">"+pos+"</a>");
+				emit newVerse(text,pos+"( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
 			}
 			break;
 	}
@@ -110,7 +110,7 @@ void verseDownloader::translate( QString text,QString pos )
 		case 1://biblegateway.com
 			w = new web( this );
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseTranslationsSite( QString, QString ) ) );
-			if(config.verseSource = 1)
+			if(config.verseSource == 1)
 			{
 					url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
 			}
@@ -139,7 +139,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 	switch (config.translationSource)
 	{
 		case 1://biblegateway.com
-			if(config.verseSource = 1)
+			if(config.verseSource == 1)
 			{
 				QString a = bout.remove(bout.indexOf("</a>)",0),bout.size());
 				a = a.remove("<div>");
@@ -181,9 +181,9 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 				pos = pos.remove(0,pos1+searchstring.size());
 				doc.setHtml(pos);
 				
-				pos = "<a href=\"http://www.biblegateway.com\">"+doc.toPlainText()+"</a>";
+				pos = doc.toPlainText();
 				qDebug() << "verseDownloader::pharseTranslationsSite() verse:"<< text;
-				emit newVerse(text,pos);
+				emit newVerse(text,pos+"( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
 			}
 			break;
 		default:
