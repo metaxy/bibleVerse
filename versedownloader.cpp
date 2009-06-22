@@ -107,12 +107,15 @@ void verseDownloader::translate( QString text,QString pos )
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseTranslationsSite( QString, QString ) ) );
 			if(config.verseSource == 1)
 			{
-					url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
+				qDebug() << "verseDownloader::translate()1 code = " << config.translationCode;
+				url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
 			}
 			else
 			{
-				p = convertPosition2Uni(pos,config.verseSource);//christnotes.org
+				
+				p = convertPosition2Uni(pos,config.verseSource);
 				newPos = convertUni2Position(p,config.translationSource);
+				qDebug() << "verseDownloader::translate()2 code = " << config.translationCode;
 				url = "http://www.biblegateway.com/passage/?search="+newPos+";&version="+config.translationCode+";&interface=print";
 			}
 			
@@ -124,7 +127,13 @@ void verseDownloader::translate( QString text,QString pos )
 void verseDownloader::pharseTranslationsSite(QString out,QString header)
 {
 	Q_UNUSED(header);
-	qDebug() << "verseDownloader::pharseTranslationsSite() translate...";
+	qDebug() << "verseDownloader::pharseTranslationsSite()";
+	if(out.contains("Error:"))
+	{
+		qDebug() << "verseDownloader::pharseTranslationsSite() Error";
+		emit newVerse("Error while loading verse. Please try an another translation.","");
+		return;
+	}
 	//pharse out
 	QString text = " ",pos = " ",searchstring;
 	QString bout = out;
@@ -141,7 +150,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 				pos = a;
 				text = a.remove(a.indexOf("(<a",0),a.size());
 				pos = pos.remove(0,pos.indexOf("\">",0)+2);
-				emit newVerse(text,pos);
+				emit newVerse(text,pos+"( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
 			}
 			else
 			{

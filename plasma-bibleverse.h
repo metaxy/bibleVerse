@@ -43,11 +43,11 @@ class PlasmaBibleVerse : public Plasma::Applet
 		void showVerse(QString text,QString pos);
 		void configAccepted();
 		void loadVerse();
+		void translationConfig(int index);
 	protected:
 		void createConfigurationInterface(KConfigDialog *parent);
 	private:
-		
-		void myPaint(QPainter *p,const QStyleOptionGraphicsItem *option, const QRect &contentsRect);
+		QStringList translationCode;
 		QString out;
 		Plasma::Svg m_svg;
 		Plasma::Label *m_label;
