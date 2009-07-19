@@ -107,7 +107,7 @@ void verseDownloader::translate( QString text,QString pos )
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseTranslationsSite( QString, QString ) ) );
 			if(config.verseSource == 1)
 			{
-				qDebug() << "verseDownloader::translate()1 code = " << config.translationCode;
+				//qDebug() << "verseDownloader::translate()1 code = " << config.translationCode;
 				url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
 			}
 			else
@@ -115,7 +115,7 @@ void verseDownloader::translate( QString text,QString pos )
 				
 				p = convertPosition2Uni(pos,config.verseSource);
 				newPos = convertUni2Position(p,config.translationSource);
-				qDebug() << "verseDownloader::translate()2 code = " << config.translationCode;
+				//qDebug() << "verseDownloader::translate()2 code = " << config.translationCode;
 				url = "http://www.biblegateway.com/passage/?search="+newPos+";&version="+config.translationCode+";&interface=print";
 			}
 			
@@ -127,7 +127,7 @@ void verseDownloader::translate( QString text,QString pos )
 void verseDownloader::pharseTranslationsSite(QString out,QString header)
 {
 	Q_UNUSED(header);
-	qDebug() << "verseDownloader::pharseTranslationsSite()";
+	//qDebug() << "verseDownloader::pharseTranslationsSite()";
 	if(out.contains("Error:"))
 	{
 		qDebug() << "verseDownloader::pharseTranslationsSite() Error";
@@ -165,7 +165,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 					qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
 					return;
 				}
-				qDebug() << "pos1:" << pos1<< "pos2"<<pos2;
+				//qDebug() << "pos1:" << pos1<< "pos2"<<pos2;
 				searchstring = "</sup>";
 				pos1 = text.indexOf(searchstring,0);
 				text = text.remove(0,pos1+searchstring.size());
@@ -186,7 +186,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 				doc.setHtml(pos);
 				
 				pos = doc.toPlainText();
-				qDebug() << "verseDownloader::pharseTranslationsSite() verse:"<< text;
+				//qDebug() << "verseDownloader::pharseTranslationsSite() verse:"<< text;
 				emit newVerse(text,pos+"( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
 			}
 			break;
@@ -205,7 +205,7 @@ verseDownloader::~verseDownloader()
 }
 struct pos verseDownloader::convertPosition2Uni(QString pos,int from)
 {
-	qDebug() << "verseDownloader::convertPosition2Uni() from:"<< from <<" pos:" << pos;
+	//qDebug() << "verseDownloader::convertPosition2Uni() from:"<< from <<" pos:" << pos;
 	struct pos uPos;
 	switch (from)
 	{
@@ -218,21 +218,21 @@ struct pos verseDownloader::convertPosition2Uni(QString pos,int from)
 			QString rest =  bpos.remove(0,point); 
 			if(point == -1)
 			{
-				qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 1";
+				//qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 1";
 				return uPos;
 			}
 			
 			QStringList list_2 = rest.split(":");
 			if(list_2.size() < 2)
 			{
-				qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 2, rest:"<<rest << " bookName"<<bookName ;
+				//qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 2, rest:"<<rest << " bookName"<<bookName ;
 				return uPos;
 			}
 			QString chapter = list_2.at(0);
 			QString verse = list_2.at(1);
 			chapter.remove(" ");
 			verse.remove(" ");
-			qDebug() << "verseDownloader::convertPosition2Uni() chapter:"<<chapter << " verse:"<<verse;
+			//qDebug() << "verseDownloader::convertPosition2Uni() chapter:"<<chapter << " verse:"<<verse;
 			
 			QMap<QString, int> bookMap;
 			bookMap["Genesis"] = 1;
@@ -304,15 +304,15 @@ struct pos verseDownloader::convertPosition2Uni(QString pos,int from)
 			uPos.bookID = bookMap[bookName];
 			uPos.bookName = bookName;
 			uPos.chapterID = chapter.toInt();
-			qDebug() <<  "verseDownloader::convertPosition2Uni() bookID:" << uPos.bookID << " bookName:" << uPos.bookName << " ";
+			//qDebug() <<  "verseDownloader::convertPosition2Uni() bookID:" << uPos.bookID << " bookName:" << uPos.bookName << " ";
 			if(verse.contains("-")) 
 			{
-				qDebug() << "verseDownloader::convertPosition2Uni() more than one verse ( verse:"<< verse << ")";
+				//qDebug() << "verseDownloader::convertPosition2Uni() more than one verse ( verse:"<< verse << ")";
 				QStringList one = verse.split("-");
 				uPos.verseID =  one.at(0).toInt();
 				uPos.verseStartID = one.at(0).toInt();
 				uPos.verseEndID = one.at(1).toInt();
-				qDebug() << "verseDownloader::convertPosition2Uni() verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
+				//qDebug() << "verseDownloader::convertPosition2Uni() verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
 			}
 			else
 			{
@@ -413,9 +413,9 @@ QString verseDownloader::convertUni2Position(struct pos uPos,int to)
 						break;
 					}
 				}
-				qDebug() << "verseDownloader::convertUni2Position()verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
+				//qDebug() << "verseDownloader::convertUni2Position()verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
 				qReturnString = bookName + " "+QString::number(uPos.chapterID)+":"+QString::number(uPos.verseStartID)+"-"+QString::number(uPos.verseEndID);
-				qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString"<<qReturnString;
+				//qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString"<<qReturnString;
 				//todo:more than one verse
 			}
 			else
@@ -433,7 +433,7 @@ QString verseDownloader::convertUni2Position(struct pos uPos,int to)
 				}
 				qReturnString = bookName + " "+QString::number(uPos.chapterID)+":"+QString::number(uPos.verseID);
 			}
-			qDebug() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
+			//qDebug() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
 			return qReturnString;
 			break;
 	}

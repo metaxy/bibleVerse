@@ -1,6 +1,5 @@
-# Project Needs a name ofcourse
 cmake_minimum_required(VERSION 2.6)
-project(plasma-tutorial1)
+project(plasma-bibleverse)
  
 # Find the required Libaries
 find_package(KDE4 REQUIRED)

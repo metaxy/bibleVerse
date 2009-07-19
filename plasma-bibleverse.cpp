@@ -34,43 +34,34 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 PlasmaBibleVerse::PlasmaBibleVerse(QObject *parent, const QVariantList &args)
 : Plasma::Applet(parent, args) ,m_layout(0L)
 {
-    setBackgroundHints(TranslucentBackground);
+	setBackgroundHints(StandardBackground);
 	setHasConfigurationInterface( true );
-	resize(250, 200);
+	resize(250,200);
 	m_layout = new QGraphicsLinearLayout(this);
 	m_layout->setContentsMargins(0,0,0,0);
 	m_layout->setSpacing(0);
-	myConfig.translationSource = 1;
-	myConfig.verseSource = 1;
-	myConfig.showPosition = true;
-	myConfig.translationCode = "10";
-	
-	KConfigGroup cg = config();
-	myConfig.translationSource = cg.readEntry("translationSource", 0);
-	myConfig.verseSource = cg.readEntry("verseSource", 1);
-	myConfig.translationCode = cg.readEntry("translationCode", "");
-	myConfig.showPosition = cg.readEntry("showPosition", true);
-	
 	out = "";
-	loadVerse();
 }
  
 PlasmaBibleVerse::~PlasmaBibleVerse()
 {
-    if (hasFailedToLaunch()) {
-        // Do some cleanup here
-    } else {
-        // Save settings
-    }
+ //nothing
 }
  
 void PlasmaBibleVerse::init()
 {
+	KConfigGroup cg = config();
+	myConfig.translationSource = cg.readEntry("translationSource", 1);
+	myConfig.verseSource = cg.readEntry("verseSource", 1);
+	myConfig.translationCode = cg.readEntry("translationCode", "10");
+	myConfig.showPosition = cg.readEntry("showPosition", true);
+	
 	setAspectRatioMode( Plasma::IgnoreAspectRatio );
 	m_label = new Plasma::Label(this);
 	m_layout->addItem(m_label);
 	loading = false;
 	createMenu();
+	loadVerse();
 } 
 void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 {
@@ -94,7 +85,6 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 	configUi.comboBox_translationSource->insertItems(0,translationSources);
 	configUi.comboBox_translationSource->setCurrentIndex(myConfig.translationSource);
 	
-	//configUi.lineEdit_translationCode->setText(myConfig.translationCode);
 	translationConfig(myConfig.translationSource);
 	if(myConfig.showPosition == false)
 	{
@@ -108,7 +98,7 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 }
 void PlasmaBibleVerse::translationConfig(int index)
 {
-	qDebug() << "translationConfig() index = " << index;
+	//qDebug() << "translationConfig() index = " << index;
 	QStringList translationText;
 	if(index == 1)
 	{
@@ -316,6 +306,7 @@ void PlasmaBibleVerse::configAccepted()
 	if (myConfig.translationCode != translationCode.at(configUi.comboBox_translation->currentIndex())) 
 	{
 		myConfig.translationCode = translationCode.at(configUi.comboBox_translation->currentIndex());
+		//qDebug() << "PlasmaBibleVerse::configAccepted() translationCode = " << myConfig.translationCode;
 		cg.writeEntry("translationCode", myConfig.translationCode);
 		changed = true;
 	}
@@ -334,7 +325,7 @@ void PlasmaBibleVerse::showVerse(QString text,QString pos)
 	lastDate = QString::number(year) + "-" + QString::number(day);*/
 
 	setBusy( false );
-	qDebug() << "PlasmaBibleVerse::showVerse() out:"<<out;
+	//qDebug() << "PlasmaBibleVerse::showVerse() out:"<<out;
 	if(myConfig.showPosition)
 	{
 		out = text+"\n<br>"+"<font size=\"-1\"><i>"+pos+"</i></font>";
