@@ -15,7 +15,7 @@ make
 make install
 kbuildsycoca4
 
-It was tested with KDE 4.2.91 and Qt 4.5.1
+It was tested with KDE 4.3.1 and Qt 4.5.1
 
 If you upgraded from a previous version, don't forget to restart plasma:
 Run the following command from the console: "kquitapp plasma-desktop && sleep 3 && plasma-desktop && exit"

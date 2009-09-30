@@ -46,16 +46,5 @@ class verseDownloader : public QObject
 		 
       
 };
-struct pos
-{
-	int bookID;
-	QString bookName;
-	int chapterID;
-	int chapterStartID;
-	int chapterEndID;
-	int verseID;
-	int verseStartID;
-	int verseEndID;
-	
-};
+
 #endif // VERSEDOWNLOADER_H

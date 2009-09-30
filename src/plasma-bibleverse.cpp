@@ -30,7 +30,14 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <KConfigDialog>
 #include <KSharedConfig>
 #include <plasma/theme.h>
- 
+#include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
+#include <swmgr.h>
+#include <swmodule.h>
+#include <markupfiltmgr.h>
+
+using namespace::sword;
 PlasmaBibleVerse::PlasmaBibleVerse(QObject *parent, const QVariantList &args)
 : Plasma::Applet(parent, args) ,m_layout(0L)
 {
@@ -80,7 +87,7 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 	configUi.comboBox_verseSource->setCurrentIndex(myConfig.verseSource);
 	
 	QStringList translationSources;
-	translationSources << "(none)" << "biblegateway.com";
+	translationSources << "(none)" << "biblegateway.com" << "SWORD Modules";
 	configUi.comboBox_translationSource->clear();
 	configUi.comboBox_translationSource->insertItems(0,translationSources);
 	configUi.comboBox_translationSource->setCurrentIndex(myConfig.translationSource);
@@ -100,6 +107,7 @@ void PlasmaBibleVerse::translationConfig(int index)
 {
 	//qDebug() << "translationConfig() index = " << index;
 	QStringList translationText;
+	
 	if(index == 1)
 	{
 		translationText 
@@ -267,6 +275,17 @@ void PlasmaBibleVerse::translationConfig(int index)
 			<<"22";
 
 
+	}
+	else if(index == 2)
+	{
+		SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
+		ModMap::iterator it;
+		translationCode.clear();
+		for (it = library.Modules.begin(); it != library.Modules.end(); it++) 
+		{
+                        translationText <<  QString((*it).second->Description());
+			translationCode <<  QString((*it).second->Name());
+		}
 	}
 	configUi.comboBox_translation->clear();
 	configUi.comboBox_translation->insertItems(0,translationText);

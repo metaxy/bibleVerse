@@ -19,14 +19,39 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <QTextDocument>
 #include <QMap>
 #include <QString>
+#include <swmgr.h>
+#include <swmodule.h>
+#include <markupfiltmgr.h>
+#include <versekey.h>
+#include <listkey.h>
 
+using sword::SWMgr;
+using sword::VerseKey;
+using sword::ListKey;
+using sword::SWModule;
+using sword::SW_POSITION;
+using sword::FMT_PLAIN;
+using sword::MarkupFilterMgr;
+using namespace::sword;
+struct pos
+{
+	int bookID;
+	QString bookName;
+	int chapterID;
+	int chapterStartID;
+	int chapterEndID;
+	int verseID;
+	int verseStartID;
+	int verseEndID;
+	
+};
 verseDownloader::verseDownloader( QObject *parent ) : QObject( parent )
 {
 
 }
 void verseDownloader::downloadNew( void )
 {
-	qDebug() << "verseDownloader::downloadNew() from " << config.verseSource;
+	//qDebug() << "verseDownloader::downloadNew() from " << config.verseSource;
 	//load site
 	switch (config.verseSource)
 	{
@@ -65,7 +90,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			pos2 = bout2.indexOf("<span class",pos1);
 			pos = bout2.remove(pos2,out.size());
 			pos = pos.remove(0,pos1+searchstring.size());
-			qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+			//qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
 			if(config.translationSource != 0)
 			{
 				translate(text,pos);
@@ -81,7 +106,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			pos = a;
 			text = a.remove(a.indexOf("(<a",0),a.size());
 			pos = pos.remove(0,pos.indexOf("\">",0)+2);
-			qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+			//qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
 			if(config.translationSource != 0)
 			{
 				translate(text,pos);
@@ -121,6 +146,35 @@ void verseDownloader::translate( QString text,QString pos )
 			
 			w->get(url);
 			break;
+		case 2://SWORD Module
+			SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
+			SWModule *target;
+			struct pos mPos = convertPosition2Uni(pos,config.verseSource);
+			QString myPos = convertUni2Position(mPos,config.translationSource);
+			
+			const char *cPos = myPos.toLatin1().data();
+			const char *cCode = config.translationCode.toLatin1().data();
+
+			VerseKey parser;
+			ListKey result;
+
+			result = parser.ParseVerseList(cPos, parser, true);
+			for (result = TOP; !result.Error(); result++)
+			{
+				//cout << result << "\n";
+			}
+			result.Persist(true);
+			
+			target = library.getModule(cCode);
+			//target->Encoding( ENC_UTF8 );
+			target->setKey(result);
+			QString out="";
+			for ((*target) = TOP; !target->Error(); (*target)++) 
+			{
+				out += QString::fromUtf8(target->RenderText());
+			}
+			emit newVerse(out,pos);
+			
 	}
 
 }
@@ -162,7 +216,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 				text = text.remove(0,pos1+searchstring.size());
 				if(pos1 == -1 || pos2 == -1)
 				{
-					qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
+					//qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
 					return;
 				}
 				//qDebug() << "pos1:" << pos1<< "pos2"<<pos2;
@@ -178,7 +232,7 @@ void verseDownloader::pharseTranslationsSite(QString out,QString header)
 				
 				if(pos1 == -1 || pos2 == -1)
 				{
-					qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
+					//qDebug() << "verseDownloader::pharseTranslationsSite() pharse Error" ;
 					return;
 				}
 				pos = bout2.remove(pos2,out.size());
@@ -211,6 +265,7 @@ struct pos verseDownloader::convertPosition2Uni(QString pos,int from)
 	{
 		case 0://christnotes.org
 		case 1://biblegateway.com
+		case 2://sword
 			QString bpos = pos;
 			QString bpos2 = pos;
 			int point = bpos.lastIndexOf(" ");
@@ -327,12 +382,8 @@ struct pos verseDownloader::convertPosition2Uni(QString pos,int from)
 }
 QString verseDownloader::convertUni2Position(struct pos uPos,int to)
 {
-	qDebug() << "verseDownloader::convertUni2Position to:" << to;
-	switch (to)
-	{
-		case 0://christnotes.org
-		case 1://biblegateway.com
-			QMap<QString, int> bookMap;
+	//qDebug() << "verseDownloader::convertUni2Position to:" << to;
+	QMap<QString, int> bookMap;
 			bookMap["Genesis"] = 1;
 			bookMap["Exodus"] = 2;
 			bookMap["Leviticus"] = 3;
@@ -400,42 +451,39 @@ QString verseDownloader::convertUni2Position(struct pos uPos,int to)
 			bookMap["Jude"] = 65;
 			bookMap["Revelation"] = 66;
 			QString qReturnString;
+			QString bookName;
+			QMapIterator<QString, int> i(bookMap);
+	switch (to)
+	{
+		case 0://christnotes.org
+		case 1://biblegateway.com
+		case 2://sword
+		
+			
+			while (i.hasNext()) 
+			{
+				i.next();
+				if(i.value() == uPos.bookID)
+				{
+					bookName = i.key();
+					break;
+				}
+			}
 			if(uPos.verseStartID != uPos.verseEndID)
 			{
-				QString bookName;
-				QMapIterator<QString, int> i(bookMap);
-				while (i.hasNext()) 
-				{
-					i.next();
-					if(i.value() == uPos.bookID)
-					{
-						bookName = i.key();
-						break;
-					}
-				}
-				//qDebug() << "verseDownloader::convertUni2Position()verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
+
+				//qDebug() << "verseDownloader::convertUni2Position() verseStartID = " << uPos.verseStartID << " verseEndID = " << uPos.verseEndID;
 				qReturnString = bookName + " "+QString::number(uPos.chapterID)+":"+QString::number(uPos.verseStartID)+"-"+QString::number(uPos.verseEndID);
-				//qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString"<<qReturnString;
-				//todo:more than one verse
+				//qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString = "<<qReturnString;
 			}
 			else
 			{
-				QString bookName;
-				QMapIterator<QString, int> i(bookMap);
-				while (i.hasNext()) 
-				{
-					i.next();
-					if(i.value() == uPos.bookID)
-					{
-						bookName = i.key();
-						break;
-					}
-				}
 				qReturnString = bookName + " "+QString::number(uPos.chapterID)+":"+QString::number(uPos.verseID);
 			}
-			//qDebug() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
+			//() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
 			return qReturnString;
 			break;
+			
 	}
 	return "";
 }
