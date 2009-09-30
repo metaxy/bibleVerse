@@ -276,7 +276,7 @@ void PlasmaBibleVerse::translationConfig(int index)
 
 
 	}
-	else if(index == 2)
+	else if(index == 2)//SWORD
 	{
 		SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
 		ModMap::iterator it;

@@ -152,8 +152,8 @@ void verseDownloader::translate( QString text,QString pos )
 			struct pos mPos = convertPosition2Uni(pos,config.verseSource);
 			QString myPos = convertUni2Position(mPos,config.translationSource);
 			
-			const char *cPos = myPos.toLatin1().data();
-			const char *cCode = config.translationCode.toLatin1().data();
+			char *cPos = pos.toLatin1().data();
+			char *cCode = config.translationCode.toLatin1().data();
 
 			VerseKey parser;
 			ListKey result;
@@ -166,13 +166,16 @@ void verseDownloader::translate( QString text,QString pos )
 			result.Persist(true);
 			
 			target = library.getModule(cCode);
-			//target->Encoding( ENC_UTF8 );
 			target->setKey(result);
-			QString out="";
+			QString out = "";
 			for ((*target) = TOP; !target->Error(); (*target)++) 
 			{
 				out += QString::fromUtf8(target->RenderText());
 			}
+			
+			/*target->setKey(cPos);
+			QString out = QString::fromUtf8(target->RenderText());*/
+			
 			emit newVerse(out,pos);
 			
 	}
