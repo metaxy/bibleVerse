@@ -90,7 +90,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			pos2 = bout2.indexOf("<span class",pos1);
 			pos = bout2.remove(pos2,out.size());
 			pos = pos.remove(0,pos1+searchstring.size());
-			//qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+			qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
 			if(config.translationSource != 0)
 			{
 				translate(text,pos);
@@ -106,7 +106,7 @@ void verseDownloader::pharseSourceSite(QString out,QString header)
 			pos = a;
 			text = a.remove(a.indexOf("(<a",0),a.size());
 			pos = pos.remove(0,pos.indexOf("\">",0)+2);
-			//qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+			qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
 			if(config.translationSource != 0)
 			{
 				translate(text,pos);
@@ -125,6 +125,7 @@ void verseDownloader::translate( QString text,QString pos )
 	QString url;
 	struct pos p;
 	QString newPos;
+	qDebug() << "verseDownloader::translate() pos = " << pos;
 	switch (config.translationSource)
 	{
 		case 1://biblegateway.com
@@ -132,7 +133,6 @@ void verseDownloader::translate( QString text,QString pos )
 			QObject::connect( w, SIGNAL( sdone( QString, QString ) ), this, SLOT( pharseTranslationsSite( QString, QString ) ) );
 			if(config.verseSource == 1)
 			{
-				//qDebug() << "verseDownloader::translate()1 code = " << config.translationCode;
 				url = "http://www.biblegateway.com/votd/get/?format=html&version="+config.translationCode;
 			}
 			else
@@ -140,7 +140,6 @@ void verseDownloader::translate( QString text,QString pos )
 				
 				p = convertPosition2Uni(pos,config.verseSource);
 				newPos = convertUni2Position(p,config.translationSource);
-				//qDebug() << "verseDownloader::translate()2 code = " << config.translationCode;
 				url = "http://www.biblegateway.com/passage/?search="+newPos+";&version="+config.translationCode+";&interface=print";
 			}
 			
@@ -151,7 +150,7 @@ void verseDownloader::translate( QString text,QString pos )
 			SWModule *target;
 			struct pos mPos = convertPosition2Uni(pos,config.verseSource);
 			QString myPos = convertUni2Position(mPos,config.translationSource);
-			
+			qDebug() << "verseDownloader::translate() sword code = " << config.translationCode;
 			char *cPos = pos.toLatin1().data();
 			char *cCode = config.translationCode.toLatin1().data();
 
@@ -161,22 +160,29 @@ void verseDownloader::translate( QString text,QString pos )
 			result = parser.ParseVerseList(cPos, parser, true);
 			for (result = TOP; !result.Error(); result++)
 			{
-				//cout << result << "\n";
+				qDebug() << result;
 			}
 			result.Persist(true);
-			
+			qDebug() << "verseDownloader::translate() sword getting module";
 			target = library.getModule(cCode);
-			target->setKey(result);
-			QString out = "";
-			for ((*target) = TOP; !target->Error(); (*target)++) 
+			if(target)
 			{
-				out += QString::fromUtf8(target->RenderText());
+				qDebug() << "verseDownloader::translate() sword set key cPos = " << cPos << " pos = " << pos;
+ 				target->setKey(result);
+				QString out = "";
+				qDebug() << "verseDownloader::translate() sword out gen";
+				out = target->RenderText();
+				for ((*target) = TOP; !target->Error(); (*target)++) 
+				{
+					out += QString::fromUtf8(target->RenderText());
+					qDebug() << out;
+				}
+				emit newVerse(out,pos);
 			}
-			
-			/*target->setKey(cPos);
-			QString out = QString::fromUtf8(target->RenderText());*/
-			
-			emit newVerse(out,pos);
+			else
+			{
+				emit newVerse("Can not load book!","");
+			}
 			
 	}
 

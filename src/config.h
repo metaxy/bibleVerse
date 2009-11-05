@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-#include <QString>
+#include <QtCore/QString>
 struct configStruct
 {
 	bool showPosition;
