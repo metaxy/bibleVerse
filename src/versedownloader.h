@@ -21,30 +21,33 @@
 #ifndef VERSEDOWNLOADER_H
 #define VERSEDOWNLOADER_H
 #include <QString>
-#include "web.h"
+#include <kio/scheduler.h>
+#include <kurl.h>
+#include <kio/jobclasses.h>
 #include "config.h"
 class verseDownloader : public QObject
 {
-	Q_OBJECT
-	public:
-		verseDownloader( QObject *parent = 0 );
-		~verseDownloader( void );
-		void setConfig( struct configStruct *newConfig);
-		void downloadNew( void );
-	signals:
-		void newVerse( QString text,QString pos);
-	public slots:
-		void pharseSourceSite(QString out,QString header);
-		void pharseTranslationsSite(QString out,QString header);
-	private:
-		void translate(QString text, QString pos);
-		struct pos convertPosition2Uni(QString pos,int from);
-		QString convertUni2Position(struct pos iPos,int to);
-		web *w;
-		bool translationNeeded;
-		struct configStruct config;
-		 
-      
+    Q_OBJECT
+public:
+    verseDownloader(QObject *parent = 0);
+    ~verseDownloader(void);
+    void setConfig(struct configStruct newConfig);
+    void downloadNew(void);
+signals:
+    void newVerse(QString text, QString pos);
+public slots:
+    void pharseSourceSite();
+    void pharseTranslationsSite();
+    void downloaded(KIO::Job *job,const QByteArray &data);
+private:
+    void translate(QString text, QString pos);
+    struct pos convertPosition2Uni(QString pos, int from);
+    QString convertUni2Position(struct pos iPos, int to);
+    bool translationNeeded;
+    struct configStruct config;
+    QString downloadedData;
+
+
 };
 
 #endif // VERSEDOWNLOADER_H

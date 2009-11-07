@@ -1,11 +1,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <QtCore/QString>
-struct configStruct
-{
-	bool showPosition;
-	int verseSource;
-	int translationSource;
-	QString translationCode;
+struct configStruct {
+    bool showPosition;
+    int verseSource;
+    int translationSource;
+    QString translationCode;
+    QString fontSize;
+    QString fontColor;
 };
 #endif // CONFIG_H

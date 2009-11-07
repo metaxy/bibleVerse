@@ -27,38 +27,40 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <Plasma/Label>
 #include "config.h"
 #include "ui_bibleVerseConfig.h"
+#include "versedownloader.h"
 class QSizeF;
 // Define our plasma Applet
 class PlasmaBibleVerse : public Plasma::Applet
 {
-		Q_OBJECT
-	public:
-		PlasmaBibleVerse(QObject *parent, const QVariantList &args);
-		~PlasmaBibleVerse();
-		void paintInterface(QPainter *painter,const QStyleOptionGraphicsItem *option,const QRect& contentsRect);
-		void init();
-		virtual QList<QAction*> contextualActions();
+    Q_OBJECT
+public:
+    PlasmaBibleVerse(QObject *parent, const QVariantList &args);
+    ~PlasmaBibleVerse();
+    void paintInterface(QPainter *painter, const QStyleOptionGraphicsItem *option, const QRect& contentsRect);
+    void init();
+    virtual QList<QAction*> contextualActions();
 
-	public slots:
-		void showVerse(QString text,QString pos);
-		void configAccepted();
-		void loadVerse();
-		void translationConfig(int index);
-	protected:
-		void createConfigurationInterface(KConfigDialog *parent);
-	private:
-		QStringList translationCode;
-		QString out;
-		Plasma::Svg m_svg;
-		Plasma::Label *m_label;
-		KIcon m_icon;
-		QGraphicsLinearLayout *m_layout;
-		Ui::bibleVerseConfig configUi;
-		struct configStruct myConfig;
-		QString lastDate;
-		bool loading;
-		QList<QAction *> actions;
-		void createMenu();
+public slots:
+    void showVerse(QString text, QString pos);
+    void configAccepted();
+    void loadVerse();
+    void translationConfig(int index);
+protected:
+    void createConfigurationInterface(KConfigDialog *parent);
+private:
+    QStringList translationCode;
+    QString out;
+    Plasma::Svg m_svg;
+    Plasma::Label *m_label;
+    KIcon m_icon;
+    QGraphicsLinearLayout *m_layout;
+    Ui::bibleVerseConfig configUi;
+    verseDownloader *vdownloader;
+    struct configStruct myConfig;
+    QString lastDate;
+    bool loading;
+    QList<QAction *> actions;
+    void createMenu();
 
 };
 K_EXPORT_PLASMA_APPLET(bibleverse, PlasmaBibleVerse)

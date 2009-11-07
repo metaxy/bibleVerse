@@ -27,15 +27,15 @@ LINK_DIRECTORIES(
 	${SWORD_LIBRARY_DIR}
 )
 # We add our source code here
-set(bibleverse_SRCS src/plasma-bibleverse.cpp src/versedownloader.cpp src/web.cpp)
+set(bibleverse_SRCS src/plasma-bibleverse.cpp src/versedownloader.cpp)
 kde4_add_ui_files(bibleverse_SRCS src/bibleVerseConfig.ui)
 qt4_automoc(${bibleverse_SRCS}) 
 # Now make sure all files get to the right place
 kde4_add_plugin(plasma_applet_bibleverse ${bibleverse_SRCS})
 target_link_libraries(plasma_applet_bibleverse
 			${KDE4_PLASMA_LIBS} 
-			${KDE4_KDEUI_LIBS} 
-			QtNetwork 
+			${KDE4_KDEUI_LIBS}
+            ${KDE4_KPARTS_LIBS}
 			${CURL_LIBRARIES} # optional, empty if not found
 			${ICU_LIBRARIES} # optional, empty if not found
 			${ICU_I18N_LIBRARIES} # optional, empty if not found
