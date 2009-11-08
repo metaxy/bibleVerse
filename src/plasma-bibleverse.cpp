@@ -76,13 +76,13 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
     connect(parent, SIGNAL(applyClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
-    
+
     QWidget *generalWidget = new QWidget(parent);
     generalConfigUi.setupUi(generalWidget);
     parent->addPage(generalWidget, i18n("General"), "preferences-desktop-locale");
-  
+
     connect(generalConfigUi.comboBox_translationSource, SIGNAL(currentIndexChanged(int)), this, SLOT(translationConfig(int)));
-    
+
     QStringList verseSources;
     verseSources << "christnotes.org" << "biblegateway.com";
     generalConfigUi.comboBox_verseSource->clear();
@@ -101,7 +101,7 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
     } else {
         generalConfigUi.checkBox_position->setCheckState(Qt::Checked);
     }*/
-    
+
     QWidget *viewWidget = new QWidget(parent);
     viewConfigUi.setupUi(viewWidget);
     parent->addPage(viewWidget, i18n("View"), "preferences-desktop-locale");
@@ -320,7 +320,7 @@ void PlasmaBibleVerse::configAccepted()
         cg.writeEntry("translationSource", myConfig.translationSource);
         changed = true;
     }
-    if(generalConfigUi.comboBox_translation->currentIndex() != -1) {
+    if (generalConfigUi.comboBox_translation->currentIndex() != -1) {
         qDebug() << " PlasmaBibleVerse::configAccepted() translation = " << generalConfigUi.comboBox_translation->currentIndex();
         if (myConfig.translationCode != translationCode.at(generalConfigUi.comboBox_translation->currentIndex())) {
             myConfig.translationCode = translationCode.at(generalConfigUi.comboBox_translation->currentIndex());
@@ -358,7 +358,7 @@ void PlasmaBibleVerse::showVerse(QString text, QString pos)
         text = text + "\n<br>" + "<font size=\"-1\"><i>" + pos + "</i></font>";
     }
     out = text;
-    
+
     update();
     loading = false;
 }

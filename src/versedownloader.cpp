@@ -55,19 +55,19 @@ void verseDownloader::downloadNew(void)
     switch (config.verseSource) {
     case 0:
         downloadedData.clear();
-        job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo );
-        connect (job, SIGNAL(  data(KIO::Job *, const QByteArray & )), this, SLOT(downloaded(KIO::Job *,const QByteArray &)));
-        connect( job, SIGNAL( result( KJob * ) ), this, SLOT( pharseSourceSite() ) );
+        job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo);
+        connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
         break;
     case 1:
         downloadedData.clear();
-        job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo );
-        connect (job, SIGNAL(  data(KIO::Job *, const QByteArray & )), this, SLOT(downloaded(KIO::Job *,const QByteArray &)));
-        connect( job, SIGNAL( result( KJob * ) ), this, SLOT( pharseSourceSite() ) );
+        job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo);
+        connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
         break;
     }
 }
-void verseDownloader::downloaded(KIO::Job *job,const QByteArray &data)
+void verseDownloader::downloaded(KIO::Job *job, const QByteArray &data)
 {
     QString out = QString::fromLocal8Bit(data);
     downloadedData += out;
@@ -133,9 +133,9 @@ void verseDownloader::translate(QString text, QString pos)
             url = "http://www.biblegateway.com/passage/?search=" + newPos + ";&version=" + config.translationCode + ";&interface=print";
         }
         downloadedData.clear();
-        job = KIO::get(KUrl(url), KIO::Reload, KIO::HideProgressInfo );
-        connect (job, SIGNAL( data(KIO::Job *, const QByteArray & )), this, SLOT(downloaded(KIO::Job *,const QByteArray &)));
-        connect( job, SIGNAL( result( KJob * ) ), this, SLOT( pharseTranslationsSite() ) );
+        job = KIO::get(KUrl(url), KIO::Reload, KIO::HideProgressInfo);
+        connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite()));
         break;
     case 2://SWORD Module
         SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
@@ -150,9 +150,9 @@ void verseDownloader::translate(QString text, QString pos)
         ListKey result;
 
         result = parser.ParseVerseList(cPos, parser, true);
-      /*  for (result = TOP; !result.Error(); result++) {
-            qDebug() << result;
-        }*/
+        /*  for (result = TOP; !result.Error(); result++) {
+              qDebug() << result;
+          }*/
         result.Persist(true);
         qDebug() << "verseDownloader::translate() sword getting module";
         target = library.getModule(cCode);
@@ -162,19 +162,17 @@ void verseDownloader::translate(QString text, QString pos)
             QString out = "";
             qDebug() << "verseDownloader::translate() sword out gen";
             out = QString::fromUtf8(target->RenderText());
-	    for (/*(*target) = TOP*/; !target->Error(); (*target)++)
-            {
-		if(target->RenderText() != NULL)
-		{
-		  out += QString::fromUtf8(target->RenderText());
-		}
+            for (/*(*target) = TOP*/; !target->Error(); (*target)++) {
+                if (target->RenderText() != NULL) {
+                    out += QString::fromUtf8(target->RenderText());
+                }
             }
             qDebug() << out;
             emit newVerse(out, pos);
         } else {
             emit newVerse("Can not load book!", "");
         }
-	break;
+        break;
 
     }
 
@@ -190,7 +188,7 @@ void verseDownloader::pharseTranslationsSite()
     }
     //pharse out
     QString text = " ", pos = " ", searchstring;
-    if(config.translationSource == 1) {
+    if (config.translationSource == 1) {
         if (config.verseSource == 1) {
             QString bout = out;
             QString a = bout.remove(bout.indexOf("</a>)", 0), bout.size());
@@ -200,15 +198,15 @@ void verseDownloader::pharseTranslationsSite()
             pos = pos.remove(0, pos.indexOf("\">", 0) + 2);
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         } else {
-          //first </sup>
-          QString s1 = "</sup>";
-          QString s2 = "</p><p /></div>";
-          int pos1 = out.indexOf(s1,0);
-          int pos2 = out.indexOf(s2,0);
-          text = out;
-          text = text.remove(pos2,out.size());
-          text = text.remove(0,pos1);
-          emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
+            //first </sup>
+            QString s1 = "</sup>";
+            QString s2 = "</p><p /></div>";
+            int pos1 = out.indexOf(s1, 0);
+            int pos2 = out.indexOf(s2, 0);
+            text = out;
+            text = text.remove(pos2, out.size());
+            text = text.remove(0, pos1);
+            emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         }
     }
     //emit newVerse(text,pos);

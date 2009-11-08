@@ -38,7 +38,7 @@ signals:
 public slots:
     void pharseSourceSite();
     void pharseTranslationsSite();
-    void downloaded(KIO::Job *job,const QByteArray &data);
+    void downloaded(KIO::Job *job, const QByteArray &data);
 private:
     void translate(QString text, QString pos);
     struct pos convertPosition2Uni(QString pos, int from);
