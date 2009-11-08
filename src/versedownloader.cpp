@@ -23,6 +23,7 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <versekey.h>
 #include <listkey.h>
 #include <klocalizedstring.h>
+#include <kdebug.h>
 
 using sword::SWMgr;
 using sword::VerseKey;
@@ -143,6 +144,7 @@ void verseDownloader::translate(QString text, QString pos)
         struct pos mPos = convertPosition2Uni(pos, config.verseSource);
         QString myPos = convertUni2Position(mPos, config.translationSource);
         qDebug() << "verseDownloader::translate() sword code = " << config.translationCode;
+	kDebug() << "a";
         char *cPos = pos.toLatin1().data();
         char *cCode = config.translationCode.toLatin1().data();
 
