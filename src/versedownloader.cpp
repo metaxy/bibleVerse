@@ -52,7 +52,6 @@ void verseDownloader::downloadNew(void)
     qDebug() << "verseDownloader::downloadNew() from " << config.verseSource;
     //load site
     KIO::TransferJob *job = NULL;
-    
     switch (config.verseSource) {
     case 0:
         downloadedData.clear();
@@ -71,7 +70,6 @@ void verseDownloader::downloadNew(void)
 void verseDownloader::downloaded(KIO::Job *job,const QByteArray &data)
 {
     QString out = QString::fromLocal8Bit(data);
-   // qDebug() << "verseDownloader::downloaded out.size() = " << out.size();
     downloadedData += out;
 }
 void verseDownloader::pharseSourceSite()
@@ -85,18 +83,18 @@ void verseDownloader::pharseSourceSite()
     int pos1, pos2;
     switch (config.verseSource) {
     case 0://christnotes.org
-        searchstring = "dbv-content\">",
-                       pos1 = bout.indexOf(searchstring, 0);
+        searchstring = "dbv-content\">";
+        pos1 = bout.indexOf(searchstring, 0);
         pos2 = bout.indexOf("</div>", pos1);
         text = bout.remove(pos2, out.size());
         text = text.remove(0, pos1 + searchstring.size());
 
-        searchstring = "dbv-reference\">",
-                       pos1 = bout2.indexOf(searchstring, 0);
+        searchstring = "dbv-reference\">";
+        pos1 = bout2.indexOf(searchstring, 0);
         pos2 = bout2.indexOf("<span class", pos1);
         pos = bout2.remove(pos2, out.size());
         pos = pos.remove(0, pos1 + searchstring.size());
-        qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+        //qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
         if (config.translationSource != 0) {
             translate(text, pos);
         } else {
@@ -109,7 +107,6 @@ void verseDownloader::pharseSourceSite()
         pos = a;
         text = a.remove(a.indexOf("(<a", 0), a.size());
         pos = pos.remove(0, pos.indexOf("\">", 0) + 2);
-        qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
         if (config.translationSource != 0) {
             translate(text, pos);
         } else {
@@ -125,7 +122,6 @@ void verseDownloader::translate(QString text, QString pos)
     QString url;
     struct pos p;
     QString newPos;
-    qDebug() << "verseDownloader::translate() pos = " << pos;
     KIO::TransferJob *job = NULL;
     switch (config.translationSource) {
     case 1://biblegateway.com
@@ -154,9 +150,9 @@ void verseDownloader::translate(QString text, QString pos)
         ListKey result;
 
         result = parser.ParseVerseList(cPos, parser, true);
-        for (result = TOP; !result.Error(); result++) {
+      /*  for (result = TOP; !result.Error(); result++) {
             qDebug() << result;
-        }
+        }*/
         result.Persist(true);
         qDebug() << "verseDownloader::translate() sword getting module";
         target = library.getModule(cCode);
@@ -166,15 +162,19 @@ void verseDownloader::translate(QString text, QString pos)
             QString out = "";
             qDebug() << "verseDownloader::translate() sword out gen";
             out = QString::fromUtf8(target->RenderText());
-            /*for ((*target) = TOP; !target->Error(); (*target)++)
+	    for (/*(*target) = TOP*/; !target->Error(); (*target)++)
             {
-                out += QString::fromUtf8(target->RenderText());
-                qDebug() << out;
-            }*/
+		if(target->RenderText() != NULL)
+		{
+		  out += QString::fromUtf8(target->RenderText());
+		}
+            }
+            qDebug() << out;
             emit newVerse(out, pos);
         } else {
             emit newVerse("Can not load book!", "");
         }
+	break;
 
     }
 
@@ -200,8 +200,6 @@ void verseDownloader::pharseTranslationsSite()
             pos = pos.remove(0, pos.indexOf("\">", 0) + 2);
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         } else {
-
-     
           //first </sup>
           QString s1 = "</sup>";
           QString s2 = "</p><p /></div>";
@@ -416,8 +414,6 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
     case 0://christnotes.org
     case 1://biblegateway.com
     case 2://sword
-
-
         while (i.hasNext()) {
             i.next();
             if (i.value() == uPos.bookID) {
@@ -426,7 +422,6 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
             }
         }
         if (uPos.verseStartID != uPos.verseEndID) {
-
             //qDebug() << "verseDownloader::convertUni2Position() verseStartID = " << uPos.verseStartID << " verseEndID = " << uPos.verseEndID;
             qReturnString = bookName + " " + QString::number(uPos.chapterID) + ":" + QString::number(uPos.verseStartID) + "-" + QString::number(uPos.verseEndID);
             //qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString = "<<qReturnString;
@@ -436,7 +431,6 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
         //() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
         return qReturnString;
         break;
-
     }
     return "";
 }

@@ -26,7 +26,8 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <Plasma/Svg>
 #include <Plasma/Label>
 #include "config.h"
-#include "ui_bibleVerseConfig.h"
+#include "ui_bibleVerseGeneralConfig.h"
+#include "ui_bibleVerseViewConfig.h"
 #include "versedownloader.h"
 class QSizeF;
 // Define our plasma Applet
@@ -54,7 +55,8 @@ private:
     Plasma::Label *m_label;
     KIcon m_icon;
     QGraphicsLinearLayout *m_layout;
-    Ui::bibleVerseConfig configUi;
+    Ui::bibleVerseGeneralConfig generalConfigUi;
+    Ui::bibleVerseViewConfig viewConfigUi;
     verseDownloader *vdownloader;
     struct configStruct myConfig;
     QString lastDate;

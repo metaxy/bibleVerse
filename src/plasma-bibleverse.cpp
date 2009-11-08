@@ -73,32 +73,39 @@ void PlasmaBibleVerse::init()
 }
 void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 {
-    QWidget *widget = new QWidget(parent);
-    configUi.setupUi(widget);
-    parent->addPage(widget, i18n("General"), "preferences-desktop-locale");
     connect(parent, SIGNAL(applyClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(configAccepted()));
-    connect(configUi.comboBox_translationSource, SIGNAL(currentIndexChanged(int)), this, SLOT(translationConfig(int)));
-    configUi.checkBox_position->setChecked(true);
+    
+    QWidget *generalWidget = new QWidget(parent);
+    generalConfigUi.setupUi(generalWidget);
+    parent->addPage(generalWidget, i18n("General"), "preferences-desktop-locale");
+  
+    connect(generalConfigUi.comboBox_translationSource, SIGNAL(currentIndexChanged(int)), this, SLOT(translationConfig(int)));
+    
     QStringList verseSources;
     verseSources << "christnotes.org" << "biblegateway.com";
-    configUi.comboBox_verseSource->clear();
-    configUi.comboBox_verseSource->insertItems(0, verseSources);
-    configUi.comboBox_verseSource->setCurrentIndex(myConfig.verseSource);
+    generalConfigUi.comboBox_verseSource->clear();
+    generalConfigUi.comboBox_verseSource->insertItems(0, verseSources);
+    generalConfigUi.comboBox_verseSource->setCurrentIndex(myConfig.verseSource);
 
     QStringList translationSources;
     translationSources << "(none)" << "biblegateway.com" << "SWORD Modules";
-    configUi.comboBox_translationSource->clear();
-    configUi.comboBox_translationSource->insertItems(0, translationSources);
-    configUi.comboBox_translationSource->setCurrentIndex(myConfig.translationSource);
+    generalConfigUi.comboBox_translationSource->clear();
+    generalConfigUi.comboBox_translationSource->insertItems(0, translationSources);
+    generalConfigUi.comboBox_translationSource->setCurrentIndex(myConfig.translationSource);
 
     translationConfig(myConfig.translationSource);
-    if (myConfig.showPosition == false) {
-        configUi.checkBox_position->setCheckState(Qt::Unchecked);
+    /*if (myConfig.showPosition == false) {
+        generalConfigUi.checkBox_position->setCheckState(Qt::Unchecked);
     } else {
-        configUi.checkBox_position->setCheckState(Qt::Checked);
-    }
+        generalConfigUi.checkBox_position->setCheckState(Qt::Checked);
+    }*/
+    
+    QWidget *viewWidget = new QWidget(parent);
+    viewConfigUi.setupUi(viewWidget);
+    parent->addPage(viewWidget, i18n("View"), "preferences-desktop-locale");
+    viewConfigUi.checkBox_position->setChecked(myConfig.showPosition);
 
 }
 void PlasmaBibleVerse::translationConfig(int index)
@@ -284,11 +291,11 @@ void PlasmaBibleVerse::translationConfig(int index)
             translationCode <<  QString((*it).second->Name());
         }
     }
-    configUi.comboBox_translation->clear();
-    configUi.comboBox_translation->insertItems(0, translationText);
+    generalConfigUi.comboBox_translation->clear();
+    generalConfigUi.comboBox_translation->insertItems(0, translationText);
     for (int i = 0; i < translationCode.size(); i++) {
         if (myConfig.translationCode == translationCode.at(i)) {
-            configUi.comboBox_translation->setCurrentIndex(i);
+            generalConfigUi.comboBox_translation->setCurrentIndex(i);
         }
     }
 }
@@ -296,27 +303,27 @@ void PlasmaBibleVerse::configAccepted()
 {
     bool changed = false;
     KConfigGroup cg = config();
-    if (myConfig.showPosition != configUi.checkBox_position->isChecked()) {
-        myConfig.showPosition = configUi.checkBox_position->isChecked();
+    if (myConfig.showPosition != viewConfigUi.checkBox_position->isChecked()) {
+        myConfig.showPosition = viewConfigUi.checkBox_position->isChecked();
         cg.writeEntry("showPosition", myConfig.showPosition);
         changed = true;
     }
 
-    if (myConfig.verseSource != configUi.comboBox_verseSource->currentIndex()) {
-        myConfig.verseSource = configUi.comboBox_verseSource->currentIndex();
+    if (myConfig.verseSource != generalConfigUi.comboBox_verseSource->currentIndex()) {
+        myConfig.verseSource = generalConfigUi.comboBox_verseSource->currentIndex();
         cg.writeEntry("verseSource", myConfig.verseSource);
         changed = true;
     }
 
-    if (myConfig.translationSource != configUi.comboBox_translationSource->currentIndex()) {
-        myConfig.translationSource = configUi.comboBox_translationSource->currentIndex();
+    if (myConfig.translationSource != generalConfigUi.comboBox_translationSource->currentIndex()) {
+        myConfig.translationSource = generalConfigUi.comboBox_translationSource->currentIndex();
         cg.writeEntry("translationSource", myConfig.translationSource);
         changed = true;
     }
-    if(configUi.comboBox_translation->currentIndex() != -1) {
-        qDebug() << " PlasmaBibleVerse::configAccepted() translation = " << configUi.comboBox_translation->currentIndex();
-        if (myConfig.translationCode != translationCode.at(configUi.comboBox_translation->currentIndex())) {
-            myConfig.translationCode = translationCode.at(configUi.comboBox_translation->currentIndex());
+    if(generalConfigUi.comboBox_translation->currentIndex() != -1) {
+        qDebug() << " PlasmaBibleVerse::configAccepted() translation = " << generalConfigUi.comboBox_translation->currentIndex();
+        if (myConfig.translationCode != translationCode.at(generalConfigUi.comboBox_translation->currentIndex())) {
+            myConfig.translationCode = translationCode.at(generalConfigUi.comboBox_translation->currentIndex());
             //qDebug() << "PlasmaBibleVerse::configAccepted() translationCode = " << myConfig.translationCode;
             cg.writeEntry("translationCode", myConfig.translationCode);
             changed = true;

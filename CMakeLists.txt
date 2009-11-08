@@ -28,7 +28,7 @@ LINK_DIRECTORIES(
 )
 # We add our source code here
 set(bibleverse_SRCS src/plasma-bibleverse.cpp src/versedownloader.cpp)
-kde4_add_ui_files(bibleverse_SRCS src/bibleVerseConfig.ui)
+kde4_add_ui_files(bibleverse_SRCS src/bibleVerseGeneralConfig.ui src/bibleVerseViewConfig.ui)
 qt4_automoc(${bibleverse_SRCS}) 
 # Now make sure all files get to the right place
 kde4_add_plugin(plasma_applet_bibleverse ${bibleverse_SRCS})
