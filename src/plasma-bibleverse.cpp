@@ -72,8 +72,8 @@ void PlasmaBibleVerse::init()
     loadVerse();
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(loadVerse()));
-    if(myConfig.autoUpdate != 0)
-	timer->start( myConfig.autoUpdate * 1000 * 60);
+    if (myConfig.autoUpdate != 0)
+        timer->start(myConfig.autoUpdate * 1000 * 60);
 }
 void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 {
@@ -113,21 +113,21 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
     connect(viewConfigUi.checkBox_fontSize, SIGNAL(toggled(bool)), viewConfigUi.kintspinbox_fontSize, SLOT(setDisabled(bool)));
     if (myConfig.fontColor != "default") {
         viewConfigUi.checkBox_fontColor->setChecked(false);
-	viewConfigUi.kcolorbutton_fontColor->setEnabled(true);
-	QColor color;
-	color.setNamedColor(myConfig.fontColor);
+        viewConfigUi.kcolorbutton_fontColor->setEnabled(true);
+        QColor color;
+        color.setNamedColor(myConfig.fontColor);
         viewConfigUi.kcolorbutton_fontColor->setColor(color);
     } else {
         viewConfigUi.checkBox_fontColor->setChecked(true);
-	viewConfigUi.kcolorbutton_fontColor->setEnabled(false);
+        viewConfigUi.kcolorbutton_fontColor->setEnabled(false);
     }
     if (myConfig.fontSize != "default") {
         viewConfigUi.checkBox_fontSize->setChecked(false);
-	viewConfigUi.kintspinbox_fontSize->setEnabled(true);
+        viewConfigUi.kintspinbox_fontSize->setEnabled(true);
         viewConfigUi.kintspinbox_fontSize->setValue(myConfig.fontSize.toInt());
     } else {
         viewConfigUi.checkBox_fontSize->setChecked(true);
-	viewConfigUi.kintspinbox_fontSize->setEnabled(false);
+        viewConfigUi.kintspinbox_fontSize->setEnabled(false);
     }
     viewConfigUi.kintspinbox_autoUpdate->setValue(myConfig.autoUpdate);
 }
@@ -377,15 +377,15 @@ void PlasmaBibleVerse::configAccepted()
             changed = true;
         }
     }
-	if (myConfig.autoUpdate != viewConfigUi.kintspinbox_autoUpdate->value()) {
-            myConfig.autoUpdate = viewConfigUi.kintspinbox_autoUpdate->value();
-	     
-            cg.writeEntry("autoUpdate", myConfig.autoUpdate);
-	    timer->stop();
-	    if(myConfig.autoUpdate != 0)
-		timer->start( myConfig.autoUpdate * 1000 * 60);
-	   
-        }
+    if (myConfig.autoUpdate != viewConfigUi.kintspinbox_autoUpdate->value()) {
+        myConfig.autoUpdate = viewConfigUi.kintspinbox_autoUpdate->value();
+
+        cg.writeEntry("autoUpdate", myConfig.autoUpdate);
+        timer->stop();
+        if (myConfig.autoUpdate != 0)
+            timer->start(myConfig.autoUpdate * 1000 * 60);
+
+    }
     if (changed == true) {
         loadVerse();
     }
