@@ -20,6 +20,7 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <QPainter>
 #include <QLabel>
 #include <QRect>
+#include <QtCore/QTimer>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsLinearLayout>
 #include <Plasma/Applet>
@@ -63,6 +64,7 @@ private:
     bool loading;
     QList<QAction *> actions;
     void createMenu();
+    QTimer *timer;
 
 };
 K_EXPORT_PLASMA_APPLET(bibleverse, PlasmaBibleVerse)

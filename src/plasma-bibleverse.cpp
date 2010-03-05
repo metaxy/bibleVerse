@@ -13,13 +13,9 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 #include "plasma-bibleverse.h"
 #include <QtGui/QPainter>
-//#include <QtGui/QFontMetrics>
-//#include <QtGui/QSizeF>
 #include <QtCore/QString>
 #include <QtGui/QGraphicsLinearLayout>
 #include <QtGui/QLabel>
-//#include <QtCore/QGraphicsScene>
-//#include <QtGui/QTextEdit>
 #include <QtCore/QDate>
 #include <QtCore/QList>
 #include <QtGui/QAction>
@@ -74,6 +70,10 @@ void PlasmaBibleVerse::init()
     loading = false;
     createMenu();
     loadVerse();
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(loadVerse()));
+    if(myConfig.autoUpdate != 0)
+	timer->start( myConfig.autoUpdate * 1000 * 60);
 }
 void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 {
@@ -134,6 +134,7 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
         viewConfigUi.checkBox_fontSize->setChecked(true);
 	viewConfigUi.kintspinbox_fontSize->setEnabled(false);
     }
+    viewConfigUi.kintspinbox_autoUpdate->setValue(myConfig.autoUpdate);
 
 
 }
@@ -389,6 +390,15 @@ void PlasmaBibleVerse::configAccepted()
             changed = true;
         }
     }
+	if (myConfig.autoUpdate != viewConfigUi.kintspinbox_autoUpdate->value()) {
+            myConfig.autoUpdate = viewConfigUi.kintspinbox_autoUpdate->value();
+	     
+            cg.writeEntry("autoUpdate", myConfig.autoUpdate);
+	    timer->stop();
+	    if(myConfig.autoUpdate != 0)
+		timer->start( myConfig.autoUpdate * 1000 * 60);
+	   
+        }
     if (changed == true) {
         loadVerse();
     }
