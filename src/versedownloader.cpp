@@ -98,7 +98,7 @@ void verseDownloader::pharseSourceSite()
         pos2 = bout2.indexOf("<span class", pos1);
         pos = bout2.remove(pos2, out.size());
         pos = pos.remove(0, pos1 + searchstring.size());
-        //qDebug() << "verseDownloader::pharseSourceSite() source pos:" << pos;
+
         if (config.translationSource != 0) {
             translate(text, pos);
         } else {
@@ -167,7 +167,7 @@ void verseDownloader::translate(QString text, QString pos)
             QString out = "";
             qDebug() << "verseDownloader::translate() sword out gen";
             out = QString::fromUtf8(target->RenderText());
-            for (/*(*target) = TOP*/; !target->Error(); (*target)++) {
+            for ((*target) = TOP; !target->Error(); (*target)++) {
                 if (target->RenderText() != NULL) {
                     out += QString::fromUtf8(target->RenderText());
                 }
@@ -227,7 +227,6 @@ verseDownloader::~verseDownloader()
 
 }
 struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
-    //qDebug() << "verseDownloader::convertPosition2Uni() from:"<< from <<" pos:" << pos;
     struct pos uPos;
     switch (from) {
     case 0://christnotes.org
@@ -239,20 +238,17 @@ struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
         QString bookName =  bpos2.remove(point, pos.size());
         QString rest =  bpos.remove(0, point);
         if (point == -1) {
-            //qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 1";
             return uPos;
         }
 
         QStringList list_2 = rest.split(":");
         if (list_2.size() < 2) {
-            //qDebug() << "verseDownloader::convertPosition2Uni() pharse Error while step 2, rest:"<<rest << " bookName"<<bookName ;
             return uPos;
         }
         QString chapter = list_2.at(0);
         QString verse = list_2.at(1);
         chapter.remove(" ");
         verse.remove(" ");
-        //qDebug() << "verseDownloader::convertPosition2Uni() chapter:"<<chapter << " verse:"<<verse;
 
         QMap<QString, int> bookMap;
         bookMap["Genesis"] = 1;
@@ -324,14 +320,11 @@ struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
         uPos.bookID = bookMap[bookName];
         uPos.bookName = bookName;
         uPos.chapterID = chapter.toInt();
-        //qDebug() <<  "verseDownloader::convertPosition2Uni() bookID:" << uPos.bookID << " bookName:" << uPos.bookName << " ";
         if (verse.contains("-")) {
-            //qDebug() << "verseDownloader::convertPosition2Uni() more than one verse ( verse:"<< verse << ")";
             QStringList one = verse.split("-");
             uPos.verseID =  one.at(0).toInt();
             uPos.verseStartID = one.at(0).toInt();
             uPos.verseEndID = one.at(1).toInt();
-            //qDebug() << "verseDownloader::convertPosition2Uni() verseStartID:"<<uPos.verseStartID << "verseeEndID"<<uPos.verseEndID;
         } else {
             uPos.verseID = verse.toInt();
             uPos.verseStartID = verse.toInt();
@@ -344,7 +337,6 @@ struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
 }
 QString verseDownloader::convertUni2Position(struct pos uPos, int to)
 {
-    //qDebug() << "verseDownloader::convertUni2Position to:" << to;
     QMap<QString, int> bookMap;
     bookMap["Genesis"] = 1;
     bookMap["Exodus"] = 2;
@@ -419,7 +411,6 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
     case 0://christnotes.org
     case 1://biblegateway.com
     case 2://sword
-
         while (i.hasNext()) {
             i.next();
             if (i.value() == uPos.bookID) {
@@ -428,15 +419,11 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
             }
         }
         if (uPos.verseStartID != uPos.verseEndID) {
-            //qDebug() << "verseDownloader::convertUni2Position() verseStartID = " << uPos.verseStartID << " verseEndID = " << uPos.verseEndID;
             qReturnString = bookName + " " + QString::number(uPos.chapterID) + ":" + QString::number(uPos.verseStartID) + "-" + QString::number(uPos.verseEndID);
-            //qDebug() << "verseDownloader::convertUni2Position() more than one verse qReturnString = "<<qReturnString;
         } else {
             qReturnString = bookName + " " + QString::number(uPos.chapterID) + ":" + QString::number(uPos.verseID);
         }
-        //() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
         return qReturnString;
-
         break;
     }
     return "";

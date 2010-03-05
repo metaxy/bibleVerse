@@ -104,11 +104,6 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
     generalConfigUi.comboBox_translationSource->setCurrentIndex(myConfig.translationSource);
 
     translationConfig(myConfig.translationSource);
-    /*if (myConfig.showPosition == false) {
-        generalConfigUi.checkBox_position->setCheckState(Qt::Unchecked);
-    } else {
-        generalConfigUi.checkBox_position->setCheckState(Qt::Checked);
-    }*/
 
     QWidget *viewWidget = new QWidget(parent);
     viewConfigUi.setupUi(viewWidget);
@@ -135,17 +130,10 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 	viewConfigUi.kintspinbox_fontSize->setEnabled(false);
     }
     viewConfigUi.kintspinbox_autoUpdate->setValue(myConfig.autoUpdate);
-
-
 }
 void PlasmaBibleVerse::translationConfig(int index)
 {
-    //qDebug() << "translationConfig() index = " << index;
     QStringList translationText;
-    /*if( index == 0) {
-        translationCode.clear();
-        translationCode << "-1";
-    } else */
     if (index == 1) {
         translationText
         << "Amuzgo de Guerrero"
@@ -358,7 +346,6 @@ void PlasmaBibleVerse::configAccepted()
         qDebug() << " PlasmaBibleVerse::configAccepted() translation = " << generalConfigUi.comboBox_translation->currentIndex();
         if (myConfig.translationCode != translationCode.at(generalConfigUi.comboBox_translation->currentIndex())) {
             myConfig.translationCode = translationCode.at(generalConfigUi.comboBox_translation->currentIndex());
-            //qDebug() << "PlasmaBibleVerse::configAccepted() translationCode = " << myConfig.translationCode;
             cg.writeEntry("translationCode", myConfig.translationCode);
             changed = true;
         }
@@ -467,7 +454,7 @@ void PlasmaBibleVerse::paintInterface(QPainter *p, const QStyleOptionGraphicsIte
 void PlasmaBibleVerse::createMenu()
 {
     actions.clear();
-    QAction *reload = new QAction(i18n("Reload Verse"), this);
+    QAction *reload = new QAction(i18n("Reload"), this);
     reload->setIcon(KIconLoader::global()->loadIcon("view-refresh", KIconLoader::NoGroup,
                     48, KIconLoader::DefaultState, QStringList(), 0L, false));
     actions.append(reload);

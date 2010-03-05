@@ -13,7 +13,6 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************/
 #ifndef bibleverse_H
 #define bibleverse_H
-#include <QString>
 #include <KIcon>
 #include <QString>
 #include <QtCore/QObject>
