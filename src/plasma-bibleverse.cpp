@@ -112,7 +112,7 @@ void PlasmaBibleVerse::createConfigurationInterface(KConfigDialog *parent)
 
     QWidget *viewWidget = new QWidget(parent);
     viewConfigUi.setupUi(viewWidget);
-    parent->addPage(viewWidget, i18n("View"), "preferences-desktop-locale");
+    parent->addPage(viewWidget, i18n("View"), "preferences-desktop-display");
     viewConfigUi.checkBox_position->setChecked(myConfig.showPosition);
     connect(viewConfigUi.checkBox_fontColor, SIGNAL(toggled(bool)), viewConfigUi.kcolorbutton_fontColor, SLOT(setDisabled(bool)));
     connect(viewConfigUi.checkBox_fontSize, SIGNAL(toggled(bool)), viewConfigUi.kintspinbox_fontSize, SLOT(setDisabled(bool)));
