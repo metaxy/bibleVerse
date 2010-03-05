@@ -17,13 +17,15 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <QtCore/QtDebug>
 #include <QtCore/QMap>
 #include <QtCore/QString>
+#include <klocalizedstring.h>
+#include <kdebug.h>
+#ifdef USE_SWORD
 #include <swmgr.h>
 #include <swmodule.h>
 #include <markupfiltmgr.h>
 #include <versekey.h>
 #include <listkey.h>
-#include <klocalizedstring.h>
-#include <kdebug.h>
+
 
 using sword::SWMgr;
 using sword::VerseKey;
@@ -33,6 +35,7 @@ using sword::SW_POSITION;
 using sword::FMT_PLAIN;
 using sword::MarkupFilterMgr;
 using namespace::sword;
+#endif
 struct pos {
     int bookID;
     QString bookName;
@@ -139,6 +142,7 @@ void verseDownloader::translate(QString text, QString pos)
         connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite()));
         break;
     case 2://SWORD Module
+	#ifdef USE_SWORD
         SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
         SWModule *target;
         struct pos mPos = convertPosition2Uni(pos, config.verseSource);
@@ -173,7 +177,9 @@ void verseDownloader::translate(QString text, QString pos)
         } else {
             emit newVerse("Can not load book!", "");
         }
+        #endif
         break;
+	
 
     }
 
@@ -413,6 +419,7 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
     case 0://christnotes.org
     case 1://biblegateway.com
     case 2://sword
+	  
         while (i.hasNext()) {
             i.next();
             if (i.value() == uPos.bookID) {
@@ -429,6 +436,7 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
         }
         //() << "verseDownloader::convertUni2Position() qReturnString:"<<qReturnString;
         return qReturnString;
+
         break;
     }
     return "";

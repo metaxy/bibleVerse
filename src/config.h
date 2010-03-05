@@ -8,5 +8,6 @@ struct configStruct {
     QString translationCode;
     QString fontSize;
     QString fontColor;
+    int autoUpdate;
 };
 #endif // CONFIG_H
