@@ -142,7 +142,7 @@ void verseDownloader::translate(QString text, QString pos)
         connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite()));
         break;
     case 2://SWORD Module
-	#ifdef USE_SWORD
+#ifdef USE_SWORD
         SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
         SWModule *target;
         struct pos mPos = convertPosition2Uni(pos, config.verseSource);
@@ -177,9 +177,9 @@ void verseDownloader::translate(QString text, QString pos)
         } else {
             emit newVerse("Can not load book!", "");
         }
-        #endif
+#endif
         break;
-	
+
 
     }
 
@@ -419,7 +419,7 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
     case 0://christnotes.org
     case 1://biblegateway.com
     case 2://sword
-	  
+
         while (i.hasNext()) {
             i.next();
             if (i.value() == uPos.bookID) {
