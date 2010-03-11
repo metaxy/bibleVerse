@@ -25,8 +25,6 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <markupfiltmgr.h>
 #include <versekey.h>
 #include <listkey.h>
-
-
 using sword::SWMgr;
 using sword::VerseKey;
 using sword::ListKey;
@@ -57,13 +55,13 @@ void verseDownloader::downloadNew(void)
     //load site
     KIO::TransferJob *job = NULL;
     switch (config.verseSource) {
-    case 0:
+    case DownloadSourceChristnotes:
         downloadedData.clear();
         job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
         connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
         break;
-    case 1:
+    case DownloadSourceBiblegateway:
         downloadedData.clear();
         job = KIO::get(KUrl("http://www.biblegateway.com/votd/get/?format=html"), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
@@ -86,7 +84,7 @@ void verseDownloader::pharseSourceSite()
     QString bout2 = out;
     int pos1, pos2;
     switch (config.verseSource) {
-    case 0://christnotes.org
+    case DownloadSourceChristnotes://christnotes.org
         //qDebug() << "out = " << out;
         searchstring = "dbv-content\">";
         pos1 = bout.indexOf(searchstring, 0);
@@ -107,7 +105,7 @@ void verseDownloader::pharseSourceSite()
             emit newVerse(text, pos);
         }
         break;
-    case 1:
+    case DownloadSourceBiblegateway:
         QString a = bout.remove(bout.indexOf("</a>)", 0), bout.size());
         a = a.remove("<div>");
         pos = a;
@@ -131,7 +129,7 @@ void verseDownloader::translate(QString text, QString pos)
     QString newPos;
     KIO::TransferJob *job = NULL;
     switch (config.translationSource) {
-    case 1://biblegateway.com
+    case TranslationSourceBiblegateway://biblegateway.com
         if (config.verseSource == 1) {
             url = "http://www.biblegateway.com/votd/get/?format=html&version=" + config.translationCode;
         } else {
@@ -199,8 +197,8 @@ void verseDownloader::pharseTranslationsSite()
     }
     //pharse out
     QString text = " ", pos = " ", searchstring;
-    if (config.translationSource == 1) {
-        if (config.verseSource == 1) {
+    if (config.translationSource == TranslationSourceBiblegateway) {
+        if (config.verseSource == DownloadSourceBiblegateway) {
             QString bout = out;
             QString a = bout.remove(bout.indexOf("</a>)", 0), bout.size());
             a = a.remove("<div>");
