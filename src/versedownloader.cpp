@@ -65,7 +65,7 @@ void verseDownloader::downloadNew(void)
         break;
     case 1:
         downloadedData.clear();
-        job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo);
+        job = KIO::get(KUrl("http://www.biblegateway.com/votd/get/?format=html"), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
         connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
         break;
@@ -87,7 +87,7 @@ void verseDownloader::pharseSourceSite()
     int pos1, pos2;
     switch (config.verseSource) {
     case 0://christnotes.org
-            qDebug() << "out = " << out;
+        //qDebug() << "out = " << out;
         searchstring = "dbv-content\">";
         pos1 = bout.indexOf(searchstring, 0);
         pos2 = bout.indexOf("</div>", pos1);
@@ -125,6 +125,7 @@ void verseDownloader::pharseSourceSite()
 void verseDownloader::translate(QString text, QString pos)
 {
     Q_UNUSED(text);
+    lastPos = "";
     QString url;
     struct pos p;
     QString newPos;
@@ -136,6 +137,7 @@ void verseDownloader::translate(QString text, QString pos)
         } else {
             p = convertPosition2Uni(pos, config.verseSource);
             newPos = convertUni2Position(p, config.translationSource);
+            lastPos = newPos;
             url = "http://www.biblegateway.com/passage/?search=" + newPos + ";&version=" + config.translationCode + ";&interface=print";
         }
         downloadedData.clear();
@@ -215,6 +217,8 @@ void verseDownloader::pharseTranslationsSite()
             text = out;
             text = text.remove(pos2, out.size());
             text = text.remove(0, pos1);
+            if(pos.isEmpty() || pos == "" || pos == " ")
+                    pos = lastPos;
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         }
     }

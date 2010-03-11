@@ -40,6 +40,7 @@ private:
     bool translationNeeded;
     struct configStruct config;
     QString downloadedData;
+    QString lastPos;
 };
 
 #endif // VERSEDOWNLOADER_H
