@@ -27,11 +27,11 @@ this program; if not, see <http://www.gnu.org/licenses/>.
 #include <KDE/KSharedConfig>
 #include <KDE/Plasma/Theme>
 #include <QtDebug>
-#ifdef USE_SWOD
+#ifdef USE_SWORD
 #include <swmgr.h>
 #include <swmodule.h>
 #include <markupfiltmgr.h>
-using namespace::sword;
+using namespace sword;
 #endif
 
 

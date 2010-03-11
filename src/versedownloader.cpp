@@ -87,6 +87,7 @@ void verseDownloader::pharseSourceSite()
     int pos1, pos2;
     switch (config.verseSource) {
     case 0://christnotes.org
+            qDebug() << "out = " << out;
         searchstring = "dbv-content\">";
         pos1 = bout.indexOf(searchstring, 0);
         pos2 = bout.indexOf("</div>", pos1);
@@ -98,6 +99,7 @@ void verseDownloader::pharseSourceSite()
         pos2 = bout2.indexOf("<span class", pos1);
         pos = bout2.remove(pos2, out.size());
         pos = pos.remove(0, pos1 + searchstring.size());
+        qDebug() << "pos = " << pos;
 
         if (config.translationSource != 0) {
             translate(text, pos);
