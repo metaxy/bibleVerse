@@ -105,7 +105,7 @@ void verseDownloader::pharseSourceSite(KJob *job)
         if (config.translationSource != 0) {
             translate(text, pos);
         } else {
-            emit newVerse(text, pos);
+            emit newVerse(text, pos + "( from <a href=\"http://www.christnotes.org/dbv.php\">christnotes.org</a> )");
         }
         break;
     case DownloadSourceBiblegateway:
