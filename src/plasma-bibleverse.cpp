@@ -72,6 +72,7 @@ void PlasmaBibleVerse::init()
     loadVerse();
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(loadVerse()));
+    connect(vdownloader, SIGNAL(newVerse(QString, QString)), this, SLOT(showVerse(QString, QString)));
     if (myConfig.autoUpdate != 0)
         timer->start(myConfig.autoUpdate * 1000 * 60);
 }
@@ -400,7 +401,6 @@ void PlasmaBibleVerse::showVerse(QString text, QString pos)
     lastDate = QString::number(year) + "-" + QString::number(day);*/
 
     setBusy(false);
-    //qDebug() << "PlasmaBibleVerse::showVerse() out:"<<out;
     if (myConfig.fontColor != "default" || myConfig.fontSize != "default") {
         qDebug() << "fontColor or fontsize not default";
         QString add = " style = \"";
@@ -417,9 +417,7 @@ void PlasmaBibleVerse::showVerse(QString text, QString pos)
     if (myConfig.showPosition) {
         text = text + "\n<br>" + "<font size =\"1\"><i>" + pos + "</i></font>";
     }
-    qDebug() << text;
     out = text;
-
     update();
     loading = false;
 }
@@ -429,7 +427,7 @@ void PlasmaBibleVerse::loadVerse()
     setBusy(true);
     vdownloader->setConfig(myConfig);
     vdownloader->downloadNew();
-    QObject::connect(vdownloader, SIGNAL(newVerse(QString, QString)), this, SLOT(showVerse(QString, QString)));
+  
 }
 void PlasmaBibleVerse::paintInterface(QPainter *p, const QStyleOptionGraphicsItem *option, const QRect &contentsRect)
 {

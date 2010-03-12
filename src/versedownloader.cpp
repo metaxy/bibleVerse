@@ -59,13 +59,13 @@ void verseDownloader::downloadNew(void)
         downloadedData.clear();
         job = KIO::get(KUrl("http://www.christnotes.org/dbv.php"), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
-        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite(KJob *)));
         break;
     case DownloadSourceBiblegateway:
         downloadedData.clear();
         job = KIO::get(KUrl("http://www.biblegateway.com/votd/get/?format=html"), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
-        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite()));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseSourceSite(KJob *)));
         break;
     }
 }
@@ -74,8 +74,13 @@ void verseDownloader::downloaded(KIO::Job *job, const QByteArray &data)
     QString out = QString::fromLocal8Bit(data);
     downloadedData += out;
 }
-void verseDownloader::pharseSourceSite()
+void verseDownloader::pharseSourceSite(KJob *job)
 {
+    if(job->error() != 0) {
+        qDebug() << "verseDownloader::pharseSourceSite() Error " << job->errorString();
+        emit newVerse(i18n("Error while loading verse. Please try an another source. ") +  job->errorString(), "");
+        return;
+    }
     QString out = downloadedData;
     qDebug() << "verseDownloader::pharseSourceSite() from " << config.verseSource << " translationSource = " << config.translationSource << " out.size = " << out.size();
     //pharse out
@@ -85,7 +90,6 @@ void verseDownloader::pharseSourceSite()
     int pos1, pos2;
     switch (config.verseSource) {
     case DownloadSourceChristnotes://christnotes.org
-        //qDebug() << "out = " << out;
         searchstring = "dbv-content\">";
         pos1 = bout.indexOf(searchstring, 0);
         pos2 = bout.indexOf("</div>", pos1);
@@ -97,7 +101,6 @@ void verseDownloader::pharseSourceSite()
         pos2 = bout2.indexOf("<span class", pos1);
         pos = bout2.remove(pos2, out.size());
         pos = pos.remove(0, pos1 + searchstring.size());
-        qDebug() << "pos = " << pos;
 
         if (config.translationSource != 0) {
             translate(text, pos);
@@ -131,19 +134,20 @@ void verseDownloader::translate(QString text, QString pos)
     QString newPos;
     KIO::TransferJob *job = NULL;
     switch (config.translationSource) {
-    case TranslationSourceBiblegateway://biblegateway.com
+    case TranslationSourceBiblegateway:
         if (config.verseSource == 1) {
             url = "http://www.biblegateway.com/votd/get/?format=html&version=" + config.translationCode;
         } else {
-            p = convertPosition2Uni(pos, config.verseSource);
+           /* p = convertPosition2Uni(pos, config.verseSource);
             newPos = convertUni2Position(p, config.translationSource);
-            lastPos = newPos;
-            url = "http://www.biblegateway.com/passage/?search=" + newPos + ";&version=" + config.translationCode + ";&interface=print";
+            lastPos = newPos;*/
+           lastPos = pos;
+            url = "http://www.biblegateway.com/passage/?search=" + lastPos + ";&version=" + config.translationCode + ";&interface=print";
         }
         downloadedData.clear();
         job = KIO::get(KUrl(url), KIO::Reload, KIO::HideProgressInfo);
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
-        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite()));
+        connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite(KJob *)));
         break;
     case 2://SWORD Module
 #ifdef USE_SWORD
@@ -176,7 +180,6 @@ void verseDownloader::translate(QString text, QString pos)
                     out += QString::fromUtf8(target->RenderText());
                 }
             }
-            qDebug() << out;
             emit newVerse(out, pos);
         } else {
             emit newVerse("Can not load book!", "");
@@ -188,11 +191,16 @@ void verseDownloader::translate(QString text, QString pos)
     }
 
 }
-void verseDownloader::pharseTranslationsSite()
+void verseDownloader::pharseTranslationsSite(KJob *job)
 {
+    if(job->error() != 0) {
+        qDebug() << "verseDownloader::pharseTranslationsSite() Error " << job->errorString();
+        emit newVerse(i18n("Error while loading verse. Please try an another translation. ") +  job->errorString(), "");
+        return;
+    }
     QString out = downloadedData;
     qDebug() << "verseDownloader::pharseTranslationsSite() config.translationSource = " << config.translationSource;
-    if (out.contains("Error:")) {
+    if (out.contains("Error:") || out.contains("No results found.")) {
         qDebug() << "verseDownloader::pharseTranslationsSite() Error";
         emit newVerse(i18n("Error while loading verse. Please try an another translation."), "");
         return;
@@ -222,7 +230,6 @@ void verseDownloader::pharseTranslationsSite()
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         }
     }
-    disconnect(0,0,this,0);
 }
 void verseDownloader::setConfig(struct configStruct newConfig)
 {

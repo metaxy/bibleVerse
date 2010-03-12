@@ -40,8 +40,8 @@ public:
 signals:
     void newVerse(QString text, QString pos);
 public slots:
-    void pharseSourceSite();
-    void pharseTranslationsSite();
+    void pharseSourceSite(KJob *);
+    void pharseTranslationsSite(KJob *);
     void downloaded(KIO::Job *job, const QByteArray &data);
 private:
     void translate(QString text, QString pos);
