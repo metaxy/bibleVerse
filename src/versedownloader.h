@@ -27,15 +27,19 @@ public:
     ~verseDownloader(void);
     void setConfig(struct configStruct newConfig);
     void downloadNew(void);
-    enum DownloadSource
-    {
+    enum DownloadSource {
         DownloadSourceChristnotes = 0,
         DownloadSourceBiblegateway = 1
     };
-    enum TranslationSource
-    {
+    enum TranslationSource {
         TranslationSourceNone = 0,
-        TranslationSourceBiblegateway = 1
+        TranslationSourceBiblegateway = 1,
+        TranslationSourceSword = 2
+    };
+    enum VerseSource {
+        VerseSourceChristnotes = 0,
+        VerseSourceBiblegateway = 1,
+        VerseSourceSword = 2
     };
 signals:
     void newVerse(QString text, QString pos);

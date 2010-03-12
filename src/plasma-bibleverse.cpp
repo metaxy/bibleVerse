@@ -42,8 +42,8 @@ PlasmaBibleVerse::PlasmaBibleVerse(QObject *parent, const QVariantList &args)
     setHasConfigurationInterface(true);
     resize(250, 200);
     m_layout = new QGraphicsLinearLayout(this);
-    m_layout->setContentsMargins(0, 0, 0, 0);
-    m_layout->setSpacing(0);
+    //  m_layout->setContentsMargins(0, 0, 0, 0);
+    //  m_layout->setSpacing(0);
     out = "";
     vdownloader = new verseDownloader(this);
 }
@@ -413,14 +413,14 @@ void PlasmaBibleVerse::showVerse(QString text, QString pos)
         }
         if (myConfig.fontSize != "default") {
             add += " font-size:" + myConfig.fontSize + "px; ";
-            addPos += " font-size:" + QString::number(myConfig.fontSize.toInt()-1) + "px; ";
+            addPos += " font-size:" + QString::number(myConfig.fontSize.toInt() - 1) + "px; ";
         }
         add += "\"";
         addPos += "\"";
         text = "<span" + add + ">" + text + "</span>";
     }
     if (myConfig.showPosition) {
-        text = text + "\n<br>" + "<span "+addPos+"><i>" + pos + "</i></span>";
+        text = text + "\n<br>" + "<span " + addPos + "><i>" + pos + "</i></span>";
     }
     out = text;
     update();

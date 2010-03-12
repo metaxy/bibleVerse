@@ -76,7 +76,7 @@ void verseDownloader::downloaded(KIO::Job *job, const QByteArray &data)
 }
 void verseDownloader::pharseSourceSite(KJob *job)
 {
-    if(job->error() != 0) {
+    if (job->error() != 0) {
         qDebug() << "verseDownloader::pharseSourceSite() Error " << job->errorString();
         emit newVerse(i18n("Error while loading verse. Please try an another source. ") +  job->errorString(), "");
         return;
@@ -121,7 +121,6 @@ void verseDownloader::pharseSourceSite(KJob *job)
         }
         break;
     }
-    //emit newVerse(text,pos);
 }
 void verseDownloader::translate(QString text, QString pos)
 {
@@ -146,7 +145,7 @@ void verseDownloader::translate(QString text, QString pos)
         connect(job, SIGNAL(data(KIO::Job *, const QByteArray &)), this, SLOT(downloaded(KIO::Job *, const QByteArray &)));
         connect(job, SIGNAL(result(KJob *)), this, SLOT(pharseTranslationsSite(KJob *)));
         break;
-    case 2://SWORD Module
+    case TranslationSourceSword:
 #ifdef USE_SWORD
         SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
         SWModule *target;
@@ -190,7 +189,7 @@ void verseDownloader::translate(QString text, QString pos)
 }
 void verseDownloader::pharseTranslationsSite(KJob *job)
 {
-    if(job->error() != 0) {
+    if (job->error() != 0) {
         qDebug() << "verseDownloader::pharseTranslationsSite() Error " << job->errorString();
         emit newVerse(i18n("Error while loading verse. Please try an another translation. ") +  job->errorString(), "");
         return;
@@ -222,8 +221,8 @@ void verseDownloader::pharseTranslationsSite(KJob *job)
             text = out;
             text = text.remove(pos2, out.size());
             text = text.remove(0, pos1);
-            if(pos.isEmpty() || pos == "" || pos == " ")
-                    pos = lastPos;
+            if (pos.isEmpty() || pos == "" || pos == " ")
+                pos = lastPos;
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
         }
     }
@@ -238,79 +237,79 @@ verseDownloader::~verseDownloader()
 }
 struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
     struct pos uPos;
-       QMap<QString, int> bookMap;
-        bookMap["Genesis"] = 1;
-        bookMap["Exodus"] = 2;
-        bookMap["Leviticus"] = 3;
-        bookMap["Numbers"] = 4;
-        bookMap["Deuteronomy"] = 5;
-        bookMap["Joshua"] = 6;
-        bookMap["Judges"] = 7;
-        bookMap["Ruth"] = 8;
-        bookMap["1 Samuel"] = 9;
-        bookMap["2 Samuel"] = 10;
-        bookMap["1 Kings"] = 11;
-        bookMap["2 Kings"] = 12;
-        bookMap["1 Chronicles"] = 13;
-        bookMap["2 Chronicles"] = 14;
-        bookMap["Ezrav"] = 15;
-        bookMap["Nehemiah"] = 16;
-        bookMap["Esther"] = 17;
-        bookMap["Job"] = 18;
-        bookMap["Psalm"] = 19;
-        bookMap["Proverbs"] = 20 ;
-        bookMap["Ecclesiastes"] = 21 ;
-        bookMap["Song of Solomon"] = 22;
-        bookMap["Isaiah"] = 23;
-        bookMap["Jeremiah"] = 24;
-        bookMap["Lamentations"] = 25;
-        bookMap["Ezekiel"] = 26;
-        bookMap["Daniel"] = 27;
-        bookMap["Hosea"] = 28;
-        bookMap["Joel"] = 29;
-        bookMap["Amos"] = 30;
-        bookMap["Obadiah"] = 31;
-        bookMap["Jonah"] = 32;
-        bookMap["Micah"] = 33;
-        bookMap["Nahum"] = 34;
-        bookMap["Habakkuk"] = 35;
-        bookMap["Zephaniah"] = 36;
-        bookMap["Haggai"] = 37;
-        bookMap["Zechariah"] = 38;
-        bookMap["Malachi"] = 39;
-        bookMap["Matthew"] = 40;
-        bookMap["Mark"] = 41;
-        bookMap["Luke"] = 42;
-        bookMap["John"] = 43;
-        bookMap["Acts"] = 44;
-        bookMap["Romans"] = 45;
-        bookMap["1 Corinthians"] = 46;
-        bookMap["2 Corinthians"] = 47;
-        bookMap["Galatians"] = 48;
-        bookMap["Ephesians"] = 49;
-        bookMap["Philippians"] = 50;
-        bookMap["Colossians"] = 51;
-        bookMap["1 Thessalonians"] = 52;
-        bookMap["2 Thessalonians"] = 53;
-        bookMap["1 Timothy"] = 54;
-        bookMap["2 Timothy"] = 55;
-        bookMap["Titus"] = 56;
-        bookMap["Philemon"] = 57;
-        bookMap["Hebrews"] = 58;
-        bookMap["James"] = 59;
-        bookMap["1 Peter"] = 60;
-        bookMap["2 Peter"] = 61;
-        bookMap["1 John"] = 62;
-        bookMap["2 John"] = 63;
-        bookMap["3 John"] = 64;
-        bookMap["Jude"] = 65;
-        bookMap["Revelation"] = 66;
-        
+    QMap<QString, int> bookMap;
+    bookMap["Genesis"] = 1;
+    bookMap["Exodus"] = 2;
+    bookMap["Leviticus"] = 3;
+    bookMap["Numbers"] = 4;
+    bookMap["Deuteronomy"] = 5;
+    bookMap["Joshua"] = 6;
+    bookMap["Judges"] = 7;
+    bookMap["Ruth"] = 8;
+    bookMap["1 Samuel"] = 9;
+    bookMap["2 Samuel"] = 10;
+    bookMap["1 Kings"] = 11;
+    bookMap["2 Kings"] = 12;
+    bookMap["1 Chronicles"] = 13;
+    bookMap["2 Chronicles"] = 14;
+    bookMap["Ezrav"] = 15;
+    bookMap["Nehemiah"] = 16;
+    bookMap["Esther"] = 17;
+    bookMap["Job"] = 18;
+    bookMap["Psalm"] = 19;
+    bookMap["Proverbs"] = 20 ;
+    bookMap["Ecclesiastes"] = 21 ;
+    bookMap["Song of Solomon"] = 22;
+    bookMap["Isaiah"] = 23;
+    bookMap["Jeremiah"] = 24;
+    bookMap["Lamentations"] = 25;
+    bookMap["Ezekiel"] = 26;
+    bookMap["Daniel"] = 27;
+    bookMap["Hosea"] = 28;
+    bookMap["Joel"] = 29;
+    bookMap["Amos"] = 30;
+    bookMap["Obadiah"] = 31;
+    bookMap["Jonah"] = 32;
+    bookMap["Micah"] = 33;
+    bookMap["Nahum"] = 34;
+    bookMap["Habakkuk"] = 35;
+    bookMap["Zephaniah"] = 36;
+    bookMap["Haggai"] = 37;
+    bookMap["Zechariah"] = 38;
+    bookMap["Malachi"] = 39;
+    bookMap["Matthew"] = 40;
+    bookMap["Mark"] = 41;
+    bookMap["Luke"] = 42;
+    bookMap["John"] = 43;
+    bookMap["Acts"] = 44;
+    bookMap["Romans"] = 45;
+    bookMap["1 Corinthians"] = 46;
+    bookMap["2 Corinthians"] = 47;
+    bookMap["Galatians"] = 48;
+    bookMap["Ephesians"] = 49;
+    bookMap["Philippians"] = 50;
+    bookMap["Colossians"] = 51;
+    bookMap["1 Thessalonians"] = 52;
+    bookMap["2 Thessalonians"] = 53;
+    bookMap["1 Timothy"] = 54;
+    bookMap["2 Timothy"] = 55;
+    bookMap["Titus"] = 56;
+    bookMap["Philemon"] = 57;
+    bookMap["Hebrews"] = 58;
+    bookMap["James"] = 59;
+    bookMap["1 Peter"] = 60;
+    bookMap["2 Peter"] = 61;
+    bookMap["1 John"] = 62;
+    bookMap["2 John"] = 63;
+    bookMap["3 John"] = 64;
+    bookMap["Jude"] = 65;
+    bookMap["Revelation"] = 66;
+
     switch (from) {
-    case 0://christnotes.org
-            pos = pos.replace(",","-");
-    case 1://biblegateway.com
-    case 2://sword
+    case VerseSourceChristnotes:
+        pos = pos.replace(",", "-");//they use instead of a - a ,
+    case VerseSourceBiblegateway:
+    case VerseSourceSword:
         QString bpos = pos;
         QString bpos2 = pos;
         int point = bpos.lastIndexOf(" ");
@@ -329,7 +328,7 @@ struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
         chapter.remove(" ");
         verse.remove(" ");
 
-     
+
         uPos.bookID = bookMap[bookName];
         uPos.bookName = bookName;
         uPos.chapterID = chapter.toInt();
@@ -421,9 +420,9 @@ QString verseDownloader::convertUni2Position(struct pos uPos, int to)
     QString bookName;
     QMapIterator<QString, int> i(bookMap);
     switch (to) {
-    case 0://christnotes.org
-    case 1://biblegateway.com
-    case 2://sword
+    case VerseSourceChristnotes:
+    case VerseSourceBiblegateway:
+    case VerseSourceSword:
         while (i.hasNext()) {
             i.next();
             if (i.value() == uPos.bookID) {
