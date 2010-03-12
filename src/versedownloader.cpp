@@ -133,13 +133,12 @@ void verseDownloader::translate(QString text, QString pos)
     KIO::TransferJob *job = NULL;
     switch (config.translationSource) {
     case TranslationSourceBiblegateway:
-        if (config.verseSource == 1) {
+        if (config.verseSource == DownloadSourceBiblegateway) {//show direct current verse
             url = "http://www.biblegateway.com/votd/get/?format=html&version=" + config.translationCode;
         } else {
-           /* p = convertPosition2Uni(pos, config.verseSource);
+            p = convertPosition2Uni(pos, config.verseSource);
             newPos = convertUni2Position(p, config.translationSource);
-            lastPos = newPos;*/
-           lastPos = pos;
+            lastPos = newPos;
             url = "http://www.biblegateway.com/passage/?search=" + lastPos + ";&version=" + config.translationCode + ";&interface=print";
         }
         downloadedData.clear();
@@ -239,29 +238,7 @@ verseDownloader::~verseDownloader()
 }
 struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
     struct pos uPos;
-    switch (from) {
-    case 0://christnotes.org
-    case 1://biblegateway.com
-    case 2://sword
-        QString bpos = pos;
-        QString bpos2 = pos;
-        int point = bpos.lastIndexOf(" ");
-        QString bookName =  bpos2.remove(point, pos.size());
-        QString rest =  bpos.remove(0, point);
-        if (point == -1) {
-            return uPos;
-        }
-
-        QStringList list_2 = rest.split(":");
-        if (list_2.size() < 2) {
-            return uPos;
-        }
-        QString chapter = list_2.at(0);
-        QString verse = list_2.at(1);
-        chapter.remove(" ");
-        verse.remove(" ");
-
-        QMap<QString, int> bookMap;
+       QMap<QString, int> bookMap;
         bookMap["Genesis"] = 1;
         bookMap["Exodus"] = 2;
         bookMap["Leviticus"] = 3;
@@ -328,6 +305,31 @@ struct pos verseDownloader::convertPosition2Uni(QString pos, int from) {
         bookMap["3 John"] = 64;
         bookMap["Jude"] = 65;
         bookMap["Revelation"] = 66;
+        
+    switch (from) {
+    case 0://christnotes.org
+            pos = pos.replace(",","-");
+    case 1://biblegateway.com
+    case 2://sword
+        QString bpos = pos;
+        QString bpos2 = pos;
+        int point = bpos.lastIndexOf(" ");
+        QString bookName =  bpos2.remove(point, pos.size());
+        QString rest =  bpos.remove(0, point);
+        if (point == -1) {
+            return uPos;
+        }
+
+        QStringList list_2 = rest.split(":");
+        if (list_2.size() < 2) {
+            return uPos;
+        }
+        QString chapter = list_2.at(0);
+        QString verse = list_2.at(1);
+        chapter.remove(" ");
+        verse.remove(" ");
+
+     
         uPos.bookID = bookMap[bookName];
         uPos.bookName = bookName;
         uPos.chapterID = chapter.toInt();
