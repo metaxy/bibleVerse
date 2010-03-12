@@ -106,7 +106,6 @@ void verseDownloader::pharseSourceSite(KJob *job)
             translate(text, pos);
         } else {
             emit newVerse(text, pos);
-            disconnect(0,0,this,0);
         }
         break;
     case DownloadSourceBiblegateway:
@@ -119,7 +118,6 @@ void verseDownloader::pharseSourceSite(KJob *job)
             translate(text, pos);
         } else {
             emit newVerse(text, pos + "( from <a href=\"http://www.biblegateway.com\">biblegateway.com</a> )");
-            disconnect(0,0,this,0);
         }
         break;
     }
