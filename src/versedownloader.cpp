@@ -149,36 +149,28 @@ void verseDownloader::translate(QString text, QString pos)
 #ifdef USE_SWORD
         SWMgr library(new MarkupFilterMgr(FMT_PLAIN));
         SWModule *target;
+
+        target = library.getModule(config.translationCode.toLatin1().data());
+        if (!target) {
+                emit newVerse("Can not load book!", "");
+        }
         struct pos mPos = convertPosition2Uni(pos, config.verseSource);
-        QString myPos = convertUni2Position(mPos, config.translationSource);
-        qDebug() << "verseDownloader::translate() sword code = " << config.translationCode;
-        char *cPos = pos.toLatin1().data();
-        char *cCode = config.translationCode.toLatin1().data();
-
-        VerseKey parser;
-        ListKey result;
-
-        result = parser.ParseVerseList(cPos, parser, true);
-        /*  for (result = TOP; !result.Error(); result++) {
-              qDebug() << result;
-          }*/
-        result.Persist(true);
-        qDebug() << "verseDownloader::translate() sword getting module";
-        target = library.getModule(cCode);
-        if (target) {
-            qDebug() << "verseDownloader::translate() sword set key cPos = " << cPos << " pos = " << pos;
-            target->setKey(result);
-            QString out = "";
-            qDebug() << "verseDownloader::translate() sword out gen";
-            out = QString::fromUtf8(target->RenderText());
-            for ((*target) = TOP; !target->Error(); (*target)++) {
-                if (target->RenderText() != NULL) {
-                    out += QString::fromUtf8(target->RenderText());
-                }
-            }
-            emit newVerse(out, pos);
-        } else {
-            emit newVerse("Can not load book!", "");
+        if(mPos.verseStartID == mPos.verseEndID) {
+                target->setKey(pos.toLatin1().data());
+                target->RenderText();
+                emit newVerse(QString::fromUtf8(target->RenderText()), pos);
+        } else  {
+                QString out = "";
+                for(int i = mPos.verseStartID; i <= mPos.verseEndID; i++) {
+                        struct pos newPos = mPos;
+                        newPos.verseStartID = i;
+                        newPos.verseEndID = i;
+                        QString myPos = convertUni2Position(newPos, config.translationSource);
+                        target->setKey(myPos.toLatin1().data());
+                        target->RenderText();
+                        out += QString::fromUtf8(target->RenderText());
+                } 
+                emit newVerse(out, pos);
         }
 #endif
         break;
